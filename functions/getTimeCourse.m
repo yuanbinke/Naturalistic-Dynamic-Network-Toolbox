@@ -28,7 +28,7 @@ errorsub = 0;
 sublist = getSublistByPrefixed(inputdir, prefix);
 
 if exist([inputdir filesep sublist(1).name]) == 7% 判断是否为文件夹
-    inputType = 0; % 0代表 inputdir里面是许多子文件夹
+    inputType = 0; % 0代表 inputdir里面是许多子文件�?
 else
     inputType = 1; % 1代表 inputdir里面是许多nii文件
 end
@@ -63,7 +63,7 @@ if size(subNiiFile, 1) == 0
     subNiiFile = dir('*.nii.gz');
 end
 
-[~, subHead] = yjj_Read(subNiiFile(1).name);
+[~, subHead] = NDN_Read(subNiiFile(1).name);
 Ntime = subHead.ImageSize(4);
 
 cd(inputdir)
@@ -95,7 +95,7 @@ for subNum = 1:Nsub
         error(['there is no nii file in the ' subNum 'th subject Directory'])
     end
     %读取文件
-    [volData, volInfo] = yjj_Read([inputdir filesep sublist(subNum).name filesep dfile(1).name]);
+    [volData, volInfo] = NDN_Read([inputdir filesep sublist(subNum).name filesep dfile(1).name]);
     
     d_reshape = reshape(volData, [size(volData,1)*size(volData,2)*size(volData,3), size(volData,4)]);
     if all(size(d_GM) ~= size(squeeze(volData(:,:,:,1))))

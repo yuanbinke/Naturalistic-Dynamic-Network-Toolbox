@@ -1,5 +1,5 @@
-function [volData, volHead] = yjj_Read(FileName, VolumeIndex)
-%function [volData, volHead] = yjj_Read(FileName, VolumeIndex)
+function [volData, volHead] = NDN_Read(FileName, VolumeIndex)
+%function [volData, volHead] = NDN_Read(FileName, VolumeIndex)
 %UNTITLED3 Summary of this function goes here
 %   Detailed explanation goes here
 

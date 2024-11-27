@@ -1,15 +1,15 @@
-function yjj_Write(volData, fileName, volHead)
-%Format: yjj_Write(volData, fileName, ?volHead)
+function NDN_Write(volData, fileName, volHead)
+%Format: NDN_Write(volData, fileName, ?volHead)
 %YJJ_WRITE Write images as NIfTI files.This function encapsulate niftiwrite() function.
-%   yjj_Write(volData, fileName) writes a '.nii' file using the image data, 
+%   NDN_Write(volData, fileName) writes a '.nii' file using the image data, 
 %   it creates a 'combined' NIfTI file that contains both metadata 
 %   and volumetric data and populates the file metadata using 
 %   default values and volume properties like size and data type
 
-%   Recommended: yjj_Write(volData, fileName, volHead) writes a '.nii' file using the image
-%   data from volData and metadata from volHead. yjj_Write creates a 'combined'
+%   Recommended: NDN_Write(volData, fileName, volHead) writes a '.nii' file using the image
+%   data from volData and metadata from volHead. NDN_Write creates a 'combined'
 %   NIFTI file, giving it the file extension '.nii'. If the metadata does
-%   not match the image size, yjj_Write will update volHead.ImageSize.
+%   not match the image size, NDN_Write will update volHead.ImageSize.
 %
 %   For more details, please refer to niftiwrite() function's comments.
 

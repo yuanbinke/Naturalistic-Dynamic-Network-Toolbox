@@ -24,15 +24,15 @@ function Yuan_RestingState_4d(DataDir,Mean4Dfile,Postfix,MaskFilename)
 % [AllVolume,VoxelSize,theImgFileList, Header] =y_ReadAll(DataDir);
 cd(DataDir)
 nii4dfile=dir('*.nii');
-[AllVolume,Header]=y_Read(nii4dfile.name);
+[AllVolume,Header]=NDN_Read(nii4dfile.name);
 [nDim1,nDim2,nDim3,nDim4]=size(AllVolume);
 
 
-[CovTempVolume] =y_Read(Mean4Dfile);
+[CovTempVolume] =NDN_Read(Mean4Dfile);
 Cov5DVolume(:,:,:,:,1) = CovTempVolume;
 
 if ~isempty(MaskFilename)
-    [MaskData,MaskVox,MaskHead]=y_ReadRPI(MaskFilename);
+    [MaskData, ~] = NDN_Read(MaskFilename);
 else
     MaskData=ones(nDim1,nDim2,nDim3);
 end
@@ -54,7 +54,7 @@ for i=1:nDim1
                 ImgCovTemp = squeeze(Cov5DVolume(i,j,k,:));
                 ImgCovTemp = (ImgCovTemp-repmat(mean(ImgCovTemp), size(ImgCovTemp,1), 1));%%Demean.
                 ImgCovTemp=[ones(size(ImgCovTemp,1),1), ImgCovTemp];
-                [b,r] = y_regress_ss(DependentVariable, ImgCovTemp);
+                [b,r] = NDN_regress_ss(DependentVariable, ImgCovTemp);
 %                 VolumeAfterRemoveCov(i,j,k,:)=DependentVariable-r;
                 restingState(i,j,k,:) = r;
                 MeanBrain(i,j,k)=b(1);
@@ -79,7 +79,7 @@ mkdir([DataDir filesep 'LOO_ResReg' filesep Postfix]);
 Header_Out = Header;
 Header_Out.pinfo = [1;0;0];
 Header_Out.dt    =[16,0];
-y_Write(restingState,Header_Out, [DataDir filesep 'LOO_ResReg' filesep Postfix filesep 'restingState_4DVolume.nii']);
+% y_Write(restingState,Header_Out, [DataDir filesep 'LOO_ResReg' filesep Postfix filesep 'restingState_4DVolume.nii']);
 % y_Write(VolumeAfterRemoveCov,Header_Out,[DataDir filesep 'LOO_ResReg' filesep Postfix filesep 'restingState_4DVolume.nii']);
 
 fprintf('\n\tRegressing Out Covariates finished.\n');

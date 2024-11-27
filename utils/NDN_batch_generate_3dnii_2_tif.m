@@ -1,5 +1,5 @@
-function yjj_batch_generate_3dnii_2_tif(inputDir)
-%YJJ_BATCH_GENERATE_3DNII_2_TIF convert all NII files under a specified
+function NDN_batch_generate_3dnii_2_tif(inputDir)
+%NDN_BATCH_GENERATE_3DNII_2_TIF convert all NII files under a specified
 %path into TIFF format images and save them in the original path.
 %
 %   

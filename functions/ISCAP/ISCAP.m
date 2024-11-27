@@ -93,7 +93,7 @@ if isfield(params, "TR")
 else
     cd([workingDir filesep subList(1).name])
     firstNIIFile = dir('*nii');
-    [~, h] = yjj_Read([workingDir filesep subList(1).name filesep firstNIIFile(1).name], 1);
+    [~, h] = NDN_Read([workingDir filesep subList(1).name filesep firstNIIFile(1).name], 1);
     if size(h.PixelDimensions, 2) == 4
         TR = h.PixelDimensions(1, 4);
     else
@@ -155,7 +155,7 @@ for i = 1:size(subList,1)
     NIIFile = dir('*.nii');
 
     tmp_data = [];
-    [d, ~]=y_Read(NIIFile(1).name);
+    [d, ~]=NDN_Read(NIIFile(1).name);
     [s1,s2,s3,s4]=size(d);
     temp=reshape(d,[s1*s2*s3,s4]);
     tmp_data=temp(mask{1},:)';
@@ -320,7 +320,7 @@ CAPToNIFTI(CAP_Zscore(CAP),...
     mask{1},brain_info{1},...
     savedDir,['CAP_NIFTI_ZScored_',runName]);
 %% brainnet viewer
-yjj_batch_generate_3dnii_2_tif(savedDir)
+NDN_batch_generate_3dnii_2_tif(savedDir)
 
 
 end

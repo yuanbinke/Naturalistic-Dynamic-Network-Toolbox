@@ -1,5 +1,5 @@
-function yjj_ctrlUiobjEdfBtnCkb(app, action)
-%YJJ_OFFUIOBJEDFBTN Control the editable state of the editField, buttons
+function ctrlUiobjEdfBtnCkb(app, action)
+%NDN_OFFUIOBJEDFBTN Control the editable state of the editField, buttons
 %and checkbox of the 'app'
 %
 %

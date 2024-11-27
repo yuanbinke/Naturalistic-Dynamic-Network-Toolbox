@@ -28,7 +28,7 @@ if size(niifile,1) == 0
     return
 end
 
-[d, h] = yjj_Read(niifile(1).name);
+[d, h] = NDN_Read(niifile(1).name);
 Ntime=size(d, 4);
 
 VData_image_masked = zeros(length(find(dR_GM)),Ntime,length(sublist));
@@ -49,7 +49,7 @@ for subji = 1:length(sublist)
         return
     end
 
-    [d, h] = yjj_Read(niifile(1).name);
+    [d, h] = NDN_Read(niifile(1).name);
     
     a_image = reshape(d, [size(d,1) * size(d,2) * size(d,3), size(d,4)]);
     VData_image_masked(:,:,subji) = a_image(find(dR_GM),:);
@@ -63,5 +63,5 @@ cd(inputdir)
 mkdir([inputdir filesep subName filesep 'LOO']);
 fname=[inputdir filesep subName filesep 'LOO' filesep 'LOO_' subName '_Mean4D.nii'];
 
-yjj_Write(y_map, fname, h);
+NDN_Write(y_map, fname, h);
 fprintf(' done! \n')

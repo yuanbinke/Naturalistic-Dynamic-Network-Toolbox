@@ -13,16 +13,16 @@ function Yuan_RegressOutRes_4d(DataDir, Mean4Dfile, dataType, MaskFilename)
 
 cd(DataDir)
 nii4dfile = dir('*.nii');
-[AllVolume, Header] = yjj_Read(nii4dfile.name);
+[AllVolume, Header] = NDN_Read(nii4dfile.name);
 [nDim1, nDim2, nDim3, nDim4]=size(AllVolume);
 
 
-[CovTempVolume, ~] = yjj_Read(Mean4Dfile);
+[CovTempVolume, ~] = NDN_Read(Mean4Dfile);
 Cov5DVolume(:,:,:,:,1) = CovTempVolume;
 
 if ~isempty(MaskFilename)
 %     [MaskData, ~] = y_ReadRPI(MaskFilename);
-    [MaskData, ~] = yjj_Read(MaskFilename);
+    [MaskData, ~] = NDN_Read(MaskFilename);
 else
     MaskData=ones(nDim1,nDim2,nDim3);
 end
@@ -45,7 +45,7 @@ for i=1:nDim1
                 ImgCovTemp = squeeze(Cov5DVolume(i,j,k,:));
                 ImgCovTemp = (ImgCovTemp - repmat(mean(ImgCovTemp),size(ImgCovTemp,1),1));%%Demean.
                 ImgCovTemp=[ones(size(ImgCovTemp,1),1),ImgCovTemp];
-                [b,r] = y_regress_ss(DependentVariable,ImgCovTemp);
+                [b,r] = NDN_regress_ss(DependentVariable,ImgCovTemp);
                 VolumeAfterRemoveCov(i,j,k,:)=DependentVariable-r;
                 VolumeResting(i,j,k,:) = r;
                 MeanBrain(i,j,k)=b(1);
@@ -70,10 +70,10 @@ mkdir(restingSaveDir);
 
 
 if strcmp(dataType, 'resting') || strcmp(dataType, 'all')
-    yjj_Write(VolumeResting, [restingSaveDir filesep 'ResRegressed_Resting_4DVolume.nii'], Header);
+    NDN_Write(VolumeResting, [restingSaveDir filesep 'ResRegressed_Resting_4DVolume.nii'], Header);
 end
 if strcmp(dataType, 'task') || strcmp(dataType, 'all')
-    yjj_Write(VolumeAfterRemoveCov, [taskSaveDir filesep 'ResRegressed_Task_4DVolume.nii'], Header);
+    NDN_Write(VolumeAfterRemoveCov, [taskSaveDir filesep 'ResRegressed_Task_4DVolume.nii'], Header);
 end
 
 fprintf('\n\tRegressing Out Covariates finished.\n');

@@ -32,8 +32,8 @@ end
 
 sublist = getSublistByPrefixed(inputdir, prefix);
 
-if exist([inputdir filesep sublist(1).name]) == 7% 判断是否为文件夹或者直接是nii文件
-    inputType = 0; % 0代表 inputdir里面是许多子文件夹
+if exist([inputdir filesep sublist(1).name]) == 7% 判断是否为文件夹或�?�直接是nii文件
+    inputType = 0; % 0代表 inputdir里面是许多子文件�?
 else
     inputType = 1; % 1代表 inputdir里面是许多nii文件
 end
@@ -122,6 +122,6 @@ for subNum = 1:length(sublist)
     end
 
 end
-yjj_batch_generate_3dnii_2_tif(savedDir)
+NDN_batch_generate_3dnii_2_tif(savedDir)
 disp('Done !')
 end

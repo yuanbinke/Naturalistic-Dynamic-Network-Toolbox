@@ -1,5 +1,5 @@
-function [flag] = yjj_isUiobjNull(app, types)
-%YJJ_IS_UIOBJ_NOTNULL can determine whether the EditField on the interface
+function [flag] = isUiobjNull(app, types)
+%NDN_IS_UIOBJ_NOTNULL can determine whether the EditField on the interface
 % is empty
 %
 %INPUT:
