@@ -8,7 +8,7 @@ function [d_GM, dR_GM, h_GM] = readGM(grayMatterMask)
 %       to the shape like (imageDim(1) * imageDim(2) * imageDim(3), 1)
 %   3): h_GM - head info of the grayMatterMask file.
 
-[d_GM, h_GM] = yjj_Read(grayMatterMask);
+[d_GM, h_GM] = NDN_Read(grayMatterMask);
 imageDim = h_GM.ImageSize;
 dR_GM = reshape(d_GM,imageDim(1)*imageDim(2)*imageDim(3),1);
 end
