@@ -16,7 +16,7 @@ niiList=dir('*.nii');
 [pathstr1, ~]=fileparts(which('BrainNet.m'));
 surfile=[pathstr1 filesep 'Data\SurfTemplate\BrainMesh_ICBM152_smoothed.nv'];
 [pathstr2, ~]=fileparts(which('NDN'));
-cfgfile=[pathstr2 filesep 'data\cfg_brainnet_subisc_noDirection.mat'];
+cfgfile=[pathstr2 filesep 'assets\cfg_brainnet_subisc_noDirection.mat'];
 
 for f=1:length(niiList)
     niifile=[inputDir filesep niiList(f).name];
