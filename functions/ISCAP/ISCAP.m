@@ -238,7 +238,7 @@ FrameIndices{1} = Indices;
 % Indices of the CAP to which frames from the reference population and from
 % the other populations are assigned
 if nargin == 6
-    app.ax.Title.String = ['Computing ' params.method ' , it will will take a long time...'];
+    app.ax.Title.String = ['Computing ' params.method ' , it will take a long time...'];
     patch(app.ax,[0, 1, 1, 0], [0, 0, 1, 1], [1, 1, 1]);
 
     app.ax.Color = [0.9375, 0.9375, 0.3375];
