@@ -1,6 +1,6 @@
 function NDN_savePlot_cluster(app, resMatFile, savedDir)
-%NDN_SAVEPLOT_CLUSTER 此处显示有关此函数的摘要
-%   此处显示详细说明
+%NDN_SAVEPLOT_CLUSTER
+
 if ~exist(savedDir, "dir")
     mkdir(savedDir)
 end
@@ -13,13 +13,12 @@ nSub = size(stateTransition, 1);
 K = app.K;
 allState = app.allState;
 colors = [
-    65, 3, 84; % 中间颜色3
-    34, 137, 139; % 中间颜色2
-    254, 255, 13; % 结束颜色
+    65, 3, 84; 
+    34, 137, 139; 
+    254, 255, 13; 
     ] / 255;
-% 定义渐变的位�?
+
 positions = [ 0, 1/2, 1];
-% 生成渐变�?
 gradientColors = interp1(positions, colors, linspace(0, 1, 1000));
 %% save stateTransition
 imagesc(stateTransition);
@@ -68,11 +67,11 @@ for i=1:K
     yticks([0:span:(nROI  - span), floor(nROI)])
     yticklabels(floor([0:span:(nROI  - span), floor(nROI)]));
 
-    % 保存为tif
+    % save as tif
     state_i_tif_name = fullfile(savedDir,['state0' num2str(i) '.tif'] );
     print(gcf, '-dtiff', '-r300', state_i_tif_name);
     close(gcf)
-    % 保存为mat
+    % save as mat
     state_i_mat_name = fullfile(savedDir,['state0' num2str(i) '.mat'] ) ;
     save(state_i_mat_name, 'tmp_state')
 end
