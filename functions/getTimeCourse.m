@@ -76,7 +76,7 @@ allSub_GMData = zeros(length(find(dR_GM)),Ntime,Nsub);
 fprintf('loading subject nii file...')
 if nargin == 4
     app.ax.Visible = 'on';
-    app.ax.Title.String = 'Loading Subjects';
+    app.ax.Title.String = 'Loading Subjects...';
     app.ax.Color = [0.9375, 0.9375, 0.3375];
     ph = patch(app.ax,[0, 0, 0, 0], [0, 0, 1, 1], [0.6745, 1, 0.8045]);
 end

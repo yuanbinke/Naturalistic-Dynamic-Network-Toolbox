@@ -1,8 +1,8 @@
 function [flag,errorsub] = computeISC(inputdir, prefix, grayMatterMask, savedDir, app)
 %computeISC  can compute n(n>=2) subject's Intersubject Correlation.
 % INPUT:
-% inputdir          - a directory which  contains all the subject data，every
-%                       subject 4D—nii file is put in a subdirectory like
+% inputdir          - a directory which contains all the subject data. Each
+%                       subject 4D nii file is put in a subdirectory like
 %                       sub001/data_sub001.nii or or directly put in inputdir
 %                       like inputdir/data_sub001.nii
 %

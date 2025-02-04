@@ -96,13 +96,13 @@ fprintf('loading subject ...')
 for subNum = 1:length(sublist)
     fprintf('..');
     cd ([inputdir filesep sublist(subNum).name])
-    dfile = dir();
-    if size(dfile,1) == 2%there is no nii file in subject subnum
+    dfile = dir('*.nii');
+    if size(dfile,1) == 0%there is no nii file in subject subnum
         flag = -1;
         errorsub = subnum;
         return
     end
-    volInfo = spm_vol(dfile(3).name);
+    volInfo = spm_vol(dfile(1).name);
 
     MTC = zeros(size(volInfo,1),length(RoiIndex));
 

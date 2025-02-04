@@ -45,7 +45,7 @@ xticklabels(floor([0:span:(nT  - span), floor(nT)].*TR));
 set(gca,'tickdir','in');
 
 filename=[savedDir filesep prefix '_stateTransition'];
-print(1,'-dtiff','-r300',filename);
+iprint(1,'-dtiff','-r300',filename);
 close(1)
 cd(savedDir)
 save([savedDir filesep  prefix '_stateTransition.mat'], "stateTransition");
@@ -54,15 +54,14 @@ save([savedDir filesep  prefix '_stateTransition.mat'], "stateTransition");
 % plot K state figure
 for i=1:K
     tmp_state = squeeze(allState(:,:,i));
-    tmp_state_normalized = normalize(tmp_state, 'range', [-1, 1]);
     figure
-    imagesc(tmp_state_normalized)
+    imagesc(tmp_state)
     colormap(gradientColors)
     colorbar
-    caxis([min(tmp_state_normalized(:)), max(tmp_state_normalized(:))])
+    caxis([min(tmp_state(:)), max(tmp_state(:))])
     title(['state0' num2str(i)])
 
-    nROI = size(tmp_state_normalized, 1);
+    nROI = size(tmp_state, 1);
     span = floor(nROI / 4);
 
     xticks([1:span:(nROI  - span), floor(nROI)])

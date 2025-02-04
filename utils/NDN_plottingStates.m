@@ -30,10 +30,11 @@ for i=minIndex : maxIndex
     ii = sprintf('%02d', i);
     app.(['UIAxes2_' num2str(count)]).Visible = "on";
     tmp_state = squeeze(allState(:, :, i));
+    tmp_state_normalized = normalize(tmp_state, 'range', [-1, 1]);
     
-    app.(['UIAxes2_' num2str(count)]).XLim = [0 size(tmp_state, 1)];
-    app.(['UIAxes2_' num2str(count)]).YLim = [0 size(tmp_state, 1)];
-    imagesc(app.(['UIAxes2_' num2str(count)]), tmp_state);
+    app.(['UIAxes2_' num2str(count)]).XLim = [0 size(tmp_state_normalized, 1)];
+    app.(['UIAxes2_' num2str(count)]).YLim = [0 size(tmp_state_normalized, 1)];
+    imagesc(app.(['UIAxes2_' num2str(count)]), tmp_state_normalized);
     app.(['UIAxes2_' num2str(count)]).Colormap = gradientColors;
     app.(['UIAxes2_' num2str(count)]).Title.String = ['state ' num2str(ii)];
     axis(app.(['UIAxes2_' num2str(count)]), 'off');

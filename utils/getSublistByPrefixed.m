@@ -4,6 +4,9 @@ if isempty(prefix) || nargin == 1
     sublist = [];
     return
 end
+if isequal(class(prefix), 'string')
+    prefix = char(prefix);
+end
 if isequal(prefix, '*')
     sublist = dir('*');
     sublist = sublist(3:end);
