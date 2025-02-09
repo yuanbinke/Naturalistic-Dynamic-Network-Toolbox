@@ -64,16 +64,16 @@ if nargin == 5
 else
     [allSub_GMData,flag,errorsub] = getTimeCourse(inputdir, prefix, grayMatterMask);
 end
-patch(app.ax,[0, 1, 1, 0], [0, 0, 1, 1], [1, 1, 1]);
-app.ax.Title.String = 'Calculating ISC...';
+
 disp('loading done!!! ')
 %%
 fprintf('Calculating ISC...')
 
 if nargin == 5
     app.ax.Title.String = 'Calculating ISC...';
-    app.ax.Color = [0.9375, 0.9375, 0.3375];
+    ph = patch(app.ax,[0, 1, 1, 0], [0, 0, 1, 1], [1, 1, 1]);
     ph = patch(app.ax,[0, 0, 0, 0], [0, 0, 1, 1], [0.6745, 1, 0.8045]);
+    drawnow
 end
 Nsub = length(sublist);
 for subNum = 1:length(sublist)

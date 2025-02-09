@@ -74,8 +74,9 @@ end
 if nargin == 6
     app.ax.Visible = 'on';
     app.ax.Title.String = 'Loading Subjects...';
-    app.ax.Color = [0.9375, 0.9375, 0.3375];
-    ph = patch(app.ax,[0, 0, 0, 0], [0, 0, 1, 1], [0.6745, 1, 0.8045]);
+    ph = patch(app.ax,[0, 1, 1, 0], [0, 0, 1, 1], [1, 1, 1]);
+    ph = patch(app.ax,[0, 0, 0, 0], [0, 0, 1, 1], [0.9375, 0.9375, 0.3375]);
+    drawnow
 end
 
 for subNum = 1:numel(sublist)
@@ -92,6 +93,13 @@ for subNum = 1:numel(sublist)
         app.ax.Title.String =[ 'loading subject nii file ' jindu '%...'];
         drawnow
     end
+end
+
+if nargin == 6
+    app.ax.Title.String = 'Calculating SWISC...';
+    ph = patch(app.ax,[0, 1, 1, 0], [0, 0, 1, 1], [1, 1, 1]);
+    ph = patch(app.ax,[0, 0, 0, 0], [0, 0, 1, 1], [0.6745, 1, 0.8045]);
+    drawnow
 end
 
 %% 2. save LOO mean TC in LOO_Mean_BOLD(nSub*volume*nT)
@@ -126,12 +134,6 @@ c = c(1:nT); %  remember that c is a standard window
 A = repmat(c,1,nR);% remember that A is nR standard window
 Nwin = nT - wsize; % the length of swisc result
 %% 4. Load all subjects' sliding windowed time series
-
-if nargin == 6
-    app.ax.Title.String = 'Calculating SWISC...';
-    app.ax.Color = [0.9375, 0.9375, 0.3375];
-    ph = patch(app.ax,[0, 0, 0, 0], [0, 0, 1, 1], [0.6745, 1, 0.8045]);
-end
 
 for suba = 1:numel(sublist)
     %% Normalize within region, then divide it by the total stddev.
@@ -218,7 +220,7 @@ for suba = 1:numel(sublist)
     if nargin == 6
         ph.XData = [0, suba / nSub, suba / nSub, 0];
         jindu = sprintf('%.2f', suba / nSub * 100);
-        app.ax.Title.String =[ 'Calculating ISC ' jindu '%...'];
+        app.ax.Title.String =[ 'Calculating SWISC ' jindu '%...'];
         drawnow
     end
 end
