@@ -1,19 +1,16 @@
-function dFC_result = NDN_ISGLKF(inputdir, savedDir, params, app)
-%FORMAT NDN_ISGLKF(inputdir, savedDir, params, app)
-%In GLKF, the current observed data are expressed as a linear
-% combination of the hidden state with the projection measurement matrix.
-% The filter alternates two main steps to estimate the hidden state:
-% prediction and update. In the prediction step, the filter recursively
-% estimates the hidden state at each time. In the update step, the filter
-% compares the predicted state and covariance with the actual measurement.
-% And ISGLKF is an improved version of GLKF. It perfrom a higher
-% spatiotemporal consistency
+function dFC_result = NDN_ISMTD(inputdir, savedDir, params, app)
+%FORMAT NDN_ISMTD(inputdir, savedDir, params, app)
+%MTD generate the products of first-order temporal derivatives for two
+% univariate time series divided by products of the standard deviations
+% of the two univariate time series. And ISMTD is an improved version of
+% MTD. It perfrom a higher spatiotemporal consistency
+%
 %
 %INPUT:
 % inputdir          - Path of nSubjects' 2D ROI timecourse mat/txt file(nT * nR)
 % savedDir          - Path for saved
 % params            - A structure containing relevant parameters of ISSWFC
-%   methodType      - Valid values are 'GLKF' or 'ISGLKF'. ISGLKF is an
+%   methodType      - Valid values are 'MTD' or 'ISMTD'. ISMTD is an
 %                     improved approach which can accomplish a higher
 %                     spatiotemporal consistency.When selecting the
 %                     original version, the ISA-type value does not need to
@@ -21,8 +18,7 @@ function dFC_result = NDN_ISGLKF(inputdir, savedDir, params, app)
 %
 %   ISA_type        - Valid values are 'regressLOO' or 'LOO'. The type of
 %                     intersubject analysis.
-%   pKF             - A number Type, default is 6
-%   ucKF            - A number Type, default is 0.03
+%   MTDwsize        - A number Type, default is 5
 %   nullMdl         - An Optional Attribute, using an empty model to
 %                     generate data, its values can be either 'ar' or 'pr'.
 %                     It will call the Phase Randomized or Multivariate ARR
@@ -36,45 +32,40 @@ else
     methodType = params.methodType;
 end
 
-if isequal(methodType, 'ISGLKF') && ~isfield(params, "ISA_type")
+if isequal(methodType, 'ISMTD') && ~isfield(params, "ISA_type")
     error("params.methodType should not be empty, it must be assgind ")
 end
 
-if isequal(methodType, 'ISGLKF') && isfield(params, "ISA_type")
+if isequal(methodType, 'ISMTD') && isfield(params, "ISA_type")
     ISA_type = params.ISA_type;
 end
 
-if ~isfield(params, "pKF")
-    error("params.pKF should not be empty, it must be assgind ")
+if ~isfield(params, "MTDwsize")
+    error("params.MTDwsize should not be empty, it must be assgind ")
 else
-    pKF = params.pKF;
+    MTDwsize = params.MTDwsize;
 end
 
-if ~isfield(params, "ucKF")
-    error("params.ucKF should not be empty, it must be assgind ")
-else
-    ucKF = params.ucKF;
-end
 
 if ~exist("savedDir", "dir")
     mkdir(savedDir)
 end
+
 if ~isfield(params, "TR")
     error("params.TR should not be empty, it must be assgind ")
 end
 cd(inputdir)
 fileList = dir('*.mat');
-%（nt *  nr * nsub�?
+
 data=read_2Dmat_2_3DmatrixROITC(inputdir);
 N_sub = size(data, 3);
 N_time = size(data, 1);
 N_roi = size(data, 2);
 
-Nwin = N_time-6;
-% pKF=6;
-% ucKF=0.03;
+Nwin = N_time;
+% MTDwsize=5;
 
-%% dynamic FC
+%%
 if nargin == 4
     app.ax.Title.String = ['Calculating ' methodType ' ...'];
     app.ax.Color = [0.9375, 0.9375, 0.3375];
@@ -82,62 +73,52 @@ if nargin == 4
 end
 dFC_result=[];
 nullMdlData_dFC_result=[];
-for s=1:N_sub
+
+for s = 1:N_sub
     subtc=squeeze(data(:,:,s));%time * ROI
 
-    if isequal(methodType, 'ISGLKF') % isxxx
+    if isequal(methodType, 'ISMTD') % isxxx
         LOO=data;
         LOO(:,:,s)=[];
-        fprintf('ISGLKF for sub %s\n', num2str(s));
+        fprintf('ISMTD for sub %s\n', num2str(s));
 
         if isequal(ISA_type,  'LOO')
-            subtc2=[subtc,squeeze(mean(LOO,3))];
-            subtc2Z=zscore(subtc2);
+
+            subtc2 = [subtc,squeeze(mean(LOO,3))];
+            subtc2Z = zscore(subtc2);
+
             %  NullMdl
             if isfield(params, "nullMdl") && ~isequal(char(params.nullMdl), '')
                 nullMdlData = squeeze(NDN_generateNullMldData(subtc2Z, params));
                 nullMdlData = zscore(nullMdlData);
-                N_time_2 = size(nullMdlData, 1);
-                Nwin_2 = N_time_2 - 6;
-                YKF = [];
-                FKF= [] ;
-                FKFR = [];
+                N_time = nullMdlData
+                Nwin = N_time;
 
-                YKF(1,:,:) = nullMdlData';
-                FKF = dynet_SSM_KF(YKF,pKF,ucKF);
-                for i=1:N_time_2
-                    FKFR(:,:,i)=icatb_corrcov(squeeze(FKF.R(:,:,i)));
-                end
+                Ct2 = coupling(nullMdlData, MTDwsize);
                 % extract the upper right ISDFC values
-                ISCt2=FKFR(1:N_roi,N_roi+1:N_roi*2,:);
+                ISCt2=Ct2(1:N_roi, N_roi + 1 : N_roi * 2, :);
 
                 % moving average DFC with window length
-                nullMdlData_tmp_dFC_DCCX = zeros(Nwin_2, N_roi*N_roi);
-                for iw=1:Nwin_2
+                nullMdlData_tmp_dFC_DCCX=zeros(Nwin,N_roi*N_roi);
+                for iw=1:Nwin
                     tmpr=ISCt2(:,:,iw);
                     nullMdlData_tmp_dFC_DCCX(iw,:)=mat2vec_Asym(tmpr);
                 end
             end
 
             %
-            YKF = [];
-            FKF= [] ;
-            FKFR = [];
-            YKF(1,:,:)=subtc2Z';
-            FKF = dynet_SSM_KF(YKF,pKF,ucKF);
-            for i=1:N_time
-                FKFR(:,:,i)=icatb_corrcov(squeeze(FKF.R(:,:,i)));
-            end
-            % extract the upper right ISDCC values
-            ISCt2=FKFR(1:N_roi,N_roi+1:N_roi*2,:);
-            % moving average DCC with window length
+            Ct2 = coupling(subtc2Z, MTDwsize);
+            % extract the upper right ISDFC values
+            ISCt2=Ct2(1:N_roi, N_roi + 1 : N_roi * 2, :);
+
+            % moving average DFC with window length
             tmp_dFC_DCCX=zeros(Nwin,N_roi*N_roi);
             for iw=1:Nwin
-                tmpr=ISCt2(:,:,iw+6);
+                tmpr=ISCt2(:,:,iw);
                 tmp_dFC_DCCX(iw,:)=mat2vec_Asym(tmpr);
             end
         end
-        if isequal(ISA_type, 'regressLOO')
+        if isequal(ISA_type,  'regressLOO')
             LOO_mean = mean(LOO,3);
             subDataAfterRemoveCov = NDN_regressLOO(subtc, LOO_mean);
             subtcZ=zscore(subDataAfterRemoveCov);
@@ -146,83 +127,51 @@ for s=1:N_sub
             if isfield(params, "nullMdl") && ~isequal(char(params.nullMdl), '')
                 nullMdlData = squeeze(NDN_generateNullMldData(subtcZ, params));
                 nullMdlData = zscore(nullMdlData);
-                N_time_2 = size(nullMdlData, 1);
-                Nwin_2 = N_time_2 - 6;
-                YKF = [];
-                FKF= [] ;
-                FKFR = [];
-                YKF(1,:,:) = nullMdlData';
-                FKF = dynet_SSM_KF(YKF,pKF,ucKF);
-                for i=1:N_time_2
-                    FKFR(:,:,i)=icatb_corrcov(squeeze(FKF.R(:,:,i)));
-                end
+                Ct2 = coupling(nullMdlData, MTDwsize);
 
-                atmp=zeros(size(FKFR,1),size(FKFR,1));
-                nullMdlData_tmp_dFC_DCCX=zeros(Nwin_2,length(mat2vec(atmp)));
-                for iw=1:Nwin_2
-                    tmpr=FKFR(:,:,iw+6);
-                    nullMdlData_tmp_dFC_DCCX(iw,:)=mat2vec(squeeze(tmpr));
+                atmp = zeros(size(Ct2,1),size(Ct2,1));
+                nullMdlData_tmp_dFC_DCCX = zeros(Nwin,length(mat2vec(atmp)));
+                for iw = 1:Nwin
+                    tmpr = Ct2(:,:,iw);
+                    nullMdlData_tmp_dFC_DCCX(iw,:) = mat2vec(squeeze(tmpr));
                 end
             end
 
-            %
-            YKF = [];
-            FKF= [] ;
-            FKFR = [];
-            YKF(1,:,:)=subtcZ';
-            FKF = dynet_SSM_KF(YKF,pKF,ucKF);
-            for i=1:N_time
-                FKFR(:,:,i)=icatb_corrcov(squeeze(FKF.R(:,:,i)));
-            end
-            atmp=zeros(size(FKFR,1),size(FKFR,1));
-            tmp_dFC_DCCX=zeros(Nwin,length(mat2vec(atmp)));
-            for iw=1:Nwin
-                tmpr=FKFR(:,:,iw+6);
-                tmp_dFC_DCCX(iw,:)=mat2vec(squeeze(tmpr));
+            Ct2 = coupling(subtcZ, MTDwsize);
+            atmp = zeros(size(Ct2,1),size(Ct2,1));
+            tmp_dFC_DCCX = zeros(Nwin,length(mat2vec(atmp)));
+            for iw = 1:Nwin
+                tmpr = Ct2(:,:,iw);
+                tmp_dFC_DCCX(iw,:) = mat2vec(squeeze(tmpr));
             end
         end
     end
-    if isequal(methodType, 'GLKF')% xxx
+    if isequal(methodType, 'MTD')% xxx
         subtcZ=zscore(subtc);%time * ROI
-        fprintf('GLKF for sub %s\n', num2str(s));
+        fprintf('MTD for sub %s\n', num2str(s));
 
         %  NullMdl
         if isfield(params, "nullMdl") && ~isequal(char(params.nullMdl), '')
             nullMdlData = squeeze(NDN_generateNullMldData(subtcZ, params));
             nullMdlData = zscore(nullMdlData);
-            N_time_2 = size(nullMdlData, 1);
-            Nwin_2 = N_time_2 - 6;
-            YKF = [];
-            FKF= [] ;
-            FKFR = [];
-            YKF(1,:,:) = nullMdlData';
-            FKF = dynet_SSM_KF(YKF,pKF,ucKF);
-            for i=1:N_time_2
-                FKFR(:,:,i)=icatb_corrcov(squeeze(FKF.R(:,:,i)));
-            end
+            Ct2 = coupling(nullMdlData, MTDwsize);
 
-            atmp=zeros(size(FKFR,1),size(FKFR,1));
-            nullMdlData_tmp_dFC_DCCX=zeros(Nwin_2,length(mat2vec(atmp)));
-            for iw=1:Nwin_2
-                tmpr=FKFR(:,:,iw+6);
-                nullMdlData_tmp_dFC_DCCX(iw,:)=mat2vec(squeeze(tmpr));
+            atmp = zeros(size(Ct2,1),size(Ct2,1));
+            nullMdlData_tmp_dFC_DCCX = zeros(Nwin,length(mat2vec(atmp)));
+            for iw = 1:Nwin
+                tmpr = Ct2(:,:,iw);
+                nullMdlData_tmp_dFC_DCCX(iw,:) = mat2vec(squeeze(tmpr));
             end
         end
 
-        YKF = [];
-        FKF= [] ;
-        FKFR = [];
-        YKF(1,:,:)=subtcZ';
-        FKF = dynet_SSM_KF(YKF,pKF,ucKF);
-        for i=1:N_time
-            FKFR(:,:,i)=icatb_corrcov(squeeze(FKF.R(:,:,i)));
-        end
+        %
+        Ct2 = coupling(subtcZ, MTDwsize);
 
-        atmp=zeros(size(FKFR,1),size(FKFR,1));
-        tmp_dFC_DCCX=zeros(Nwin,length(mat2vec(atmp)));
-        for iw=1:Nwin
-            tmpr=FKFR(:,:,iw+6);
-            tmp_dFC_DCCX(iw,:)=mat2vec(squeeze(tmpr));
+        atmp = zeros(size(Ct2,1),size(Ct2,1));
+        tmp_dFC_DCCX = zeros(Nwin,length(mat2vec(atmp)));
+        for iw = 1:Nwin
+            tmpr = Ct2(:,:,iw);
+            tmp_dFC_DCCX(iw,:) = mat2vec(squeeze(tmpr));
         end
 
     end
@@ -246,7 +195,7 @@ for s=1:N_sub
     pIND = sort(imax);%?
     k1_peaks(s) = length(pIND);%?
     SP{s,1} = tmp_dFC(pIND, :);%Subsampling
-    dFC_result=[dFC_result;tmp_dFC];
+    dFC_result=[dFC_result; tmp_dFC];
 
     if nargin == 4
         ph.XData = [0, s / N_sub, s / N_sub, 0];
@@ -254,20 +203,19 @@ for s=1:N_sub
         app.ax.Title.String =[ 'Calculating ' methodType ' ' jindu '%...'];
         drawnow
     end
-end
+end%s
 
 cd(savedDir)
 % transform dFC_result's shape
 % from [N_time*N_sub, size(dFC_result, 2)] ===> [N_time, size(dFC_result, 2), N_sub]
 dFC_result1 = reshape(dFC_result, [size(dFC_result, 1) / N_sub, N_sub, size(dFC_result, 2)]);
-dFC_result2 = zeros(size(dFC_result, 1)/ N_sub, size(dFC_result, 2), N_sub);
+dFC_result2 = zeros(size(dFC_result, 1) / N_sub, size(dFC_result, 2), N_sub);
 for i = 1:size(dFC_result, 1)/ N_sub
     dFC_result2(i, :, :) = squeeze(dFC_result1(i, :, :))';
 end
 
 res.SP = SP;
 res.dFC_result = dFC_result;
-res.dFC_result_3D = dFC_result2;
 res.method = methodType;
 res.TR = params.TR;
 res.N_sub = N_sub;
@@ -295,7 +243,6 @@ if isfield(params, "nullMdl") && ~isequal(char(params.nullMdl), '')
 
     nullMdlData_res.SP = nullMdlData_SP;
     nullMdlData_res.dFC_result = nullMdlData_dFC_result;
-    nullMdlData_res.dFC_result_3D = dFC_result2;
     nullMdlData_res.method = methodType;
     nullMdlData_res.TR = params.TR;
     nullMdlData_res.N_sub = N_sub;
