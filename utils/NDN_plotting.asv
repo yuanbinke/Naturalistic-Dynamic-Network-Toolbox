@@ -1,7 +1,7 @@
 function  NDN_plotting(app, resMatFile)
 %NDN_PLOTTING 此处显示有关此函数的摘要app, resMatFile
 %   此处显示详细说明
-% resMatFile = 'H:\paranoia\allRun\data\ROITC\default\old\ISDCC-Result\ISDCC_regressLOO_all.mat';
+resMatFile = 'H:\paranoia\allRun\data\ROITC\default\old\ISDCC-Result\ISDCC_regressLOO_all.mat';
 %% get infos
 res = importdata(resMatFile);
 TR = res.TR;
@@ -26,7 +26,7 @@ app.UIAxes.CLim = ([1,K + 1]);
 span = floor(nT / 4);
 app.UIAxes.XTick = [0:span:(nT  - span), floor(nT)];
 app.UIAxes.XTickLabel = floor([0:span:(nT  - span), floor(nT)].*TR);
-app.UIAxes.Title.String = "State transition";
+app.UIAxes.Title.String = "State Transition";
 for i = 1:K
     app.(['State' num2str(i) 'Label']).FontColor = custom_cm(i, :);
     app.(['State' num2str(i) 'Label']).Visible = 'on';
@@ -45,7 +45,7 @@ app.UIAxes3_1.YLim = [0, max(stateFrequency) + 0.1];
 app.UIAxes3_1.XLim = [0.5, K + 0.5];
 app.UIAxes3_1.XTick = 1:1:K;
 app.UIAxes3_1.XTickLabel = TickLabel;
-app.UIAxes3_1.Title.String = "Overall state frequency";
+app.UIAxes3_1.Title.String = "Overall State Frequency";
 
 app.UIAxes3_1.Visible = 'on';
 
@@ -85,7 +85,7 @@ app.UIAxes3_2.YTick = 1:1:K;
 app.UIAxes3_2.XTickLabel = TickLabel;
 app.UIAxes3_2.YTickLabel = TickLabel;
 app.UIAxes3_2.TickLength = [0 0];
-app.UIAxes3_2.Title.String = "Transition probability between states";
+app.UIAxes3_2.Title.String = "Transition Probability between States";
 
 app.UIAxes3_2.Visible = 'on';
 colorbar(app.UIAxes3_2)
@@ -96,30 +96,25 @@ imagesc(app.UIAxes3_3, correlation_matrix);
 app.UIAxes3_3.Colormap = jet;
 app.UIAxes3_3.CLim = [-1 1];
 
-app.UIAxes3_3.XLim = [0.5, nSub+0.5];
-app.UIAxes3_3.YLim = [0.5, nSub+0.5];
+app.UIAxes3_3.XLim = [0.5, nSub+1];
+app.UIAxes3_3.YLim = [0.5, nSub+1];
 
 
-app.UIAxes3_3.Title.String = "Between subject state correlation";
+app.UIAxes3_3.Title.String = "Subject State Series Correlation";
 app.UIAxes3_3.YAxis.Visible = 'off';
 app.UIAxes3_3.XAxis.Visible = 'off';
 app.UIAxes3_3.Title.Visible = 'on';
-if nSub > 5
-    span = floor(nSub / 3);
-    app.UIAxes3_3.YTick = [0:span:(nSub - 1  - span), floor(nSub - 1)] +0.5;
-    app.UIAxes3_3.YTickLabel = [0:span:(nSub - 1  - span), floor(nSub - 1)] + 1;
-    app.UIAxes3_3.XTick = [0:span:(nSub - 1  - span), floor(nSub - 1)] +0.5;
-    app.UIAxes3_3.XTickLabel = [0:span:(nSub - 1  - span), floor(nSub - 1)] + 1;
+if nSub > 3
+    interval = 1:nSub/4:nSub;
 else
-    span = 0:nSub-1;
-    app.UIAxes3_3.YTick = span + 0.5;
-    app.UIAxes3_3.YTickLabel = span + 1;
+    interval = 1:nSub;
 end
+app.UIAxes3_3.XTick = interval;
+app.UIAxes3_3.YTick = interval;
+app.UIAxes3_3.XTickLabel = interval;
+app.UIAxes3_3.YTickLabel = interval;
 
 
-
-app.UIAxes3_3.XAxis.Visible = 'on';
-app.UIAxes3_3.YAxis.Visible = 'on';
 colorbar(app.UIAxes3_3)
 
 end

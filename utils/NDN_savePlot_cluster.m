@@ -13,6 +13,10 @@ stateTransition = app.stateTransition;
 nT = size(stateTransition, 2);
 nSub = size(stateTransition, 1);
 K = app.K;
+for s = 1:K
+    TickLabel{s} = sprintf('S%d', s);
+end
+
 allState = app.allState;
 colors = [
     65, 3, 84; 
@@ -23,6 +27,7 @@ colors = [
 positions = [ 0, 1/2, 1];
 gradientColors = interp1(positions, colors, linspace(0, 1, 1000));
 %% save stateTransition
+figure
 imagesc(stateTransition);
 custom_cm = cbrewer('qual','Set1',K);
 colormap((custom_cm));
@@ -81,11 +86,13 @@ end
 
 %% stateFrequency
 figure
-stateFrequency = histcounts(stateTransition(:), 1:5) / numel(stateTransition);
+stateFrequency = histcounts(stateTransition(:), 1:K+1) / numel(stateTransition);
 bar(stateFrequency, 0.5);
-ylim([0, max(stateFrequency) + 0.2]);
-title('Overall State Frequency')
-set(gca,'XTick',[1,2,3 4],'XTickLabel',{'S1','S2','S3','S4'})
+ylim([0, max(stateFrequency) + 0.1]);
+xlim([0.5, K + 0.5]);
+
+title('Overall state frequency')
+set(gca, 'XTick', 1:K, 'XTickLabel', TickLabel)
 
 % save as tif
 stateFrequency_tif_name = fullfile(savedDir, [prefix '_stateFrequency.tif'] );
@@ -96,18 +103,13 @@ stateFrequency_mat_name = fullfile(savedDir, [prefix '_stateFrequency.mat'] );
 save(stateFrequency_mat_name, 'stateFrequency')
 
 %% Transition probability
-states = unique(stateTransition); % 获取唯一的状态值
-n = length(states);    % 状态数量
-
-% 初始化转换矩阵
+states = unique(stateTransition); 
+n = length(states);   
 state_to_state = zeros(n, n);
-
-% 遍历序列，统计状态转换
 for s = 1:nSub
     for i = 1:nT-1
-        current_state = stateTransition(s, i);      % 当前状态
-        next_state = stateTransition(s, i+1);       % 下一个状态
-        % 在转换矩阵中累加计数
+        current_state = stateTransition(s, i);    
+        next_state = stateTransition(s, i+1);       
         state_to_state(current_state, next_state) = state_to_state(current_state, next_state) + 1;
     end
 end
@@ -121,19 +123,17 @@ textStrings = num2str(state_to_state(:), '%0.2f');       % Create strings from t
 textStrings = strtrim(cellstr(textStrings));  % Remove any space padding
 [x, y] = meshgrid(1:size(state_to_state,1));  % Create x and y coordinates for the strings
 hStrings = text(x(:), y(:), textStrings(:), ...  % Plot the strings
-    'HorizontalAlignment', 'center','FontSize',18);
+    'HorizontalAlignment', 'center','FontSize',18 - n);
 
 midValue = mean(get(gca, 'CLim'));
 textColors = repmat(state_to_state(:) > midValue, 1, 3);
 set(hStrings, {'Color'}, num2cell(textColors, 2));
-for s = 1:K
-    TickLabel{s} = sprintf('S%02d', s);
-end
+
 set(gca, 'XTick', 1:K,'XTickLabel', TickLabel, ...
     'YTick', 1:K, 'YTickLabel', TickLabel, ...
     'TickLength', [0 0]);
 set(gca, 'FontName','Arial','FontSize', 14,'LineWidth', 2.5);
-title('Transition Probability between States')
+title('Transition probability between states')
 
 % save as tif
 transitionProbability_tif_name = fullfile(savedDir, [prefix '_transitionProbability.tif'] );
@@ -150,7 +150,7 @@ imagesc(correlation_matrix);
 colormap(jet);
 caxis([-1 1]); 
 colorbar;
-title('Subject State Series Correlation');
+title('Between subject state correlation');
 set(gca, 'FontName','Arial','FontSize', 12);
 
 % save as tif
