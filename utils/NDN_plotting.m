@@ -1,7 +1,8 @@
 function  NDN_plotting(app, resMatFile)
 %NDN_PLOTTING 此处显示有关此函数的摘要app, resMatFile
 %   此处显示详细说明
-% resMatFile = 'H:\paranoia\allRun\data\ROITC\default\old\ISDCC-Result\ISDCC_regressLOO_all.mat';
+% NDN_plotting(Cluster_Plotting_app
+% resMatFile = 'H:\paranoia\allRun\data\ROITC\default\old\test\DCC_all.mat';
 %% get infos
 res = importdata(resMatFile);
 TR = res.TR;
@@ -88,12 +89,14 @@ app.UIAxes3_2.TickLength = [0 0];
 app.UIAxes3_2.Title.String = "Transition probability between states";
 
 app.UIAxes3_2.Visible = 'on';
-colorbar(app.UIAxes3_2)
+cbar = colorbar(app.UIAxes3_2);
+app.cbar.UIAxes3_2 = cbar;
 %% plotting correlation matrix
 
 correlation_matrix = corrcoef(stateTransition');
 imagesc(app.UIAxes3_3, correlation_matrix);
-app.UIAxes3_3.Colormap = jet;
+myJet = importdata("myJet.mat");
+app.UIAxes3_3.Colormap = myJet;
 app.UIAxes3_3.CLim = [-1 1];
 
 app.UIAxes3_3.XLim = [0.5, nSub+0.5];
@@ -120,7 +123,7 @@ end
 
 app.UIAxes3_3.XAxis.Visible = 'on';
 app.UIAxes3_3.YAxis.Visible = 'on';
-colorbar(app.UIAxes3_3)
-
+cbar = colorbar(app.UIAxes3_3);
+app.cbar.UIAxes3_3 = cbar;
 end
 
