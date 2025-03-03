@@ -8,7 +8,7 @@ function [ROI_TC, flag, errorsub] = getROITimeCourse(inputdir, prefix, ROIMask, 
 %   inputdir        - A directory containing all subject data. Each subject's 
 %                     4D nii file is stored in a separate subdirectory. The 
 %                     expected structure is:
-%                     - sub001/func/data_sub001.nii(.gz),recommended or
+%                     - sub001/func/data_sub001.nii(.gz), or
 %                     - sub001/data_sub001.nii(.gz).
 %
 %   prefix          - A string used to identify the target subdirectories 
@@ -49,35 +49,15 @@ function [ROI_TC, flag, errorsub] = getROITimeCourse(inputdir, prefix, ROIMask, 
 flag = 1;
 errorsub = 0;
 
-sublist = getSublistByPrefixed(inputdir, prefix);
+% sublist = getSublistByPrefixed(inputdir, prefix);
+% 
+% if exist([inputdir filesep sublist(1).name]) == 7 
+%     inputType = 0; % 0 represent sublist(1).name is dir
+% else
+%     inputType = 1; % 1 represent sublist(1).name is file
+% end
 
-% Initialize counters for directories and files
-dirCount = 0;
-fileCount = 0;
 
-% Loop through all items in sublist
-for i = 1:length(sublist)
-    itemPath = fullfile(inputdir, sublist(i).name);
-    
-    if exist(itemPath, 'dir') == 7
-        dirCount = dirCount + 1; % Increment directory count
-    elseif exist(itemPath, 'file') == 2
-        fileCount = fileCount + 1; % Increment file count
-    else
-        error('Invalid item detected: %s is neither a directory nor a file.', itemPath);
-    end
-end
-
-% Determine inputType based on counts
-if dirCount > 0 && fileCount > 0
-    error('Mixed items detected: inputdir contains both directories and files.');
-elseif dirCount == length(sublist)
-    inputType = 0; % All items are directories
-elseif fileCount == length(sublist)
-    inputType = 1; % All items are files
-else
-    error('Unexpected error: unable to determine inputType.');
-end
 
 % move each nii file into a seperate subdirectory
 if inputType == 1 
@@ -135,10 +115,9 @@ end
 
 if nargin == 4
     app.ax.Visible = 'on';
-    app.ax.Title.String = 'Loading Subjects...';
-    ph = patch(app.ax,[0, 1, 1, 0], [0, 0, 1, 1], [1, 1, 1]);
+
+    app.ax.Title.String = 'Loading Subjects';
     ph = patch(app.ax,[0, 0, 0, 0], [0, 0, 1, 1], [0.9375, 0.9375, 0.3375]);
-    drawnow
 end
 
 % get ROI time course
@@ -147,32 +126,13 @@ fprintf('loading subject ...')
 
 for subNum = 1:length(sublist)
     fprintf('..');
-    if ~exist([inputdir filesep sublist(subNum).name filesep 'func'])
-        mkdir([inputdir filesep sublist(subNum).name filesep 'func'])
-    end 
-    cd([inputdir filesep sublist(subNum).name filesep 'func'])
-
-    % In the /func directory, find the first .nii file. If no .nii file exists,
-    % it will retrieve the first .nii.gz file. If neither .nii nor .nii.gz files
-    % are found in the /func directory, it will move to the upper directory
-    % and perform the search in the same way.
+    cd ([inputdir filesep sublist(subNum).name])
     dfile = dir('*.nii');
-    if size(dfile, 1) == 0
-        dfile = dir('*.nii.gz');
-    end
-    if size(dfile, 1) == 0
-        cd('..')
-        dfile = dir('*.nii');
-        if size(dfile, 1) == 0
-            dfile = dir('*.nii.gz');
-        end
-    end
-    if size(dfile,1) == 0 % there is no nii file in subject subnum
+    if size(dfile,1) == 0%there is no nii file in subject subnum
         flag = -1;
-        errorsub = subNum;
-        error(['there is no .nii or .nii.gz file in' sublist(subNum).name])
+        errorsub = subnum;
+        return
     end
-
     volInfo = spm_vol(dfile(1).name);
 
     MTC = zeros(size(volInfo,1),length(RoiIndex));

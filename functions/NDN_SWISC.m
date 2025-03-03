@@ -1,28 +1,40 @@
 function NDN_SWISC(inputdir, prefix, grayMatterMask, params, savedDir, app)
-%FORMAT NDN_SWISC(inputdir, prefix, grayMatterMask, params, savedDir, app)
+%FORMAT: NDN_SWISC(inputdir, prefix, grayMatterMask, params, savedDir, app)
+% NDN_SWISC computes the Sliding-Window Intersubject Correlation (SWISC) 
+% for gray matter voxels across multiple subjects.
+%
 % INPUT:
-% inputdir          - a directory which contains all the subject data. Each
-%                       subject 4D nii file is put in a subdirectory like
-%                       sub001/data_sub001.nii
+%   inputdir        - A directory containing all subject data. Each subject's 
+%                     data is stored in a separate subdirectory. The expected 
+%                     structure is:
+%                     - sub001/func/data_sub001.nii(.gz), recommended or
+%                     - sub001/data_sub001.nii(.gz).
 %
-% prefix            - a String whose contents are decided by the target 
-%                     subdirectorys or files in inputdir
+%   prefix          - A string used to identify the target subdirectories 
+%                     or files within the inputdir. For example, if the 
+%                     subject directories are named 'sub001', 'sub002', etc., 
+%                     the prefix could be 'sub'.
 %
-% grayMatterMask    - the address of the grayMatter file
-% params            - A structure containing relevant parameters of ISSWFC
-%   wsize        - The size of the sliding-window
-%                     
-%   sigma        - Parameters affecting the shape of the sliding window. 
-%                  Default value is 3. 
-% savedDir          - Path for saved, optional argument, default content is
-%                     [inputdir filesep 'SWISC-Result']. The results of 
-%                     SWISC for gray matter voxels will be saved in the
-%                     'mat' subfolder as MAT files.Additionally, the result
-%                     matrices will be converted into 4D format and stored
-%                     as .nii files in the 'nii' subfolder. Finally, the 4D   
-%                     SWISC results for each subject will be averaged over
-%                     the time dimension and stored in the 'niiMean' folder
-% app               - a optional argument, is a uiobject
+%   grayMatterMask  - The file path to a gray matter mask file. This mask is 
+%                     used to extract time course data from the gray matter 
+%                     region of the functional images.
+%
+%   params          - A structure containing parameters for the SWISC computation:
+%       - wsize    : The size of the sliding window.
+%       - sigma    : Parameters affecting the shape of the sliding window. 
+%                    The default value is 3.
+%
+%   savedDir        - (Optional) The directory path where the SWISC results 
+%                     will be saved. If not provided, the default path is 
+%                     [inputdir filesep 'SWISC-Result']. The results include:
+%                     - MAT files stored in the 'mat' subfolder.
+%                     - 4D .nii files stored in the 'nii' subfolder.
+%                     - Time-averaged 4D SWISC results stored in the 'niiMean' 
+%                       subfolder.
+%
+%   app             - (Optional) A UI object (e.g., a progress bar or 
+%                     message display) for providing feedback during the 
+%                     execution of the function.
 
 
 if ~isfield(params, "wsize")
@@ -45,21 +57,9 @@ end
 [datlas, ~] = NDN_Read(grayMatterMask);
 datlasR = reshape(datlas, [size(datlas,1) * size(datlas,2) * size(datlas,3), 1]);
 
-% get nT nSub nR
-sublist = getSublistByPrefixed(inputdir, prefix);
-cd([inputdir filesep sublist(1).name])
-sub01nii = dir('*.nii');
-sub_h = spm_vol(sub01nii.name);
-
-nT = size(sub_h, 1);
-nSub = size(sublist, 1);
-nR = sum(datlasR);
-
 savepath_mat = [savedDir, '/mat/win_', num2str(wsize) '_sigma_' num2str(sigma)];
 savepath_nii = [savedDir, '/nii/win_', num2str(wsize) '_sigma_' num2str(sigma)];
 savepath_meanNii = [savedDir, '/niiMean/win_', num2str(wsize) '_sigma_' num2str(sigma)];
-
-
 if exist(savepath_mat, 'dir') == 0
     mkdir(savepath_mat);
 end
@@ -69,31 +69,33 @@ end
 if  exist(savepath_meanNii, 'dir') == 0 
     mkdir(savepath_meanNii);
 end
-%% 1. load all subjects in BOLD(nSub*volume*tr)
 
-if nargin == 6
-    app.ax.Visible = 'on';
-    app.ax.Title.String = 'Loading Subjects...';
-    ph = patch(app.ax,[0, 1, 1, 0], [0, 0, 1, 1], [1, 1, 1]);
-    ph = patch(app.ax,[0, 0, 0, 0], [0, 0, 1, 1], [0.9375, 0.9375, 0.3375]);
-    drawnow
+
+%% 1. load all subjects in BOLD(nVoxel, nT, nSub)
+
+% get BOLD
+[BOLD, ~, ~] = getTimeCourse(inputdir, prefix, grayMatterMask, app);
+
+% get nT nSub nR h
+sublist = getSublistByPrefixed(inputdir, prefix);
+if ~exist([inputdir filesep sublist(1).name filesep 'func'])
+    mkdir([inputdir filesep sublist(1).name filesep 'func'])
+end 
+cd([inputdir filesep sublist(1).name filesep 'func'])
+sub01nii = dir('*.nii');
+if size(sub01nii, 1) == 0
+    sub01nii = dir('*.nii.gz');
 end
-
-for subNum = 1:numel(sublist)
-    fprintf('loading subject %d ... \n',subNum);
-    cd([inputdir filesep sublist(subNum).name])
-    dfile=dir('*.nii');
-    [d, h] = NDN_Read([inputdir filesep sublist(subNum).name filesep dfile(1).name]);
-    a_image = reshape(d,[size(d,1)*size(d,2)*size(d,3),size(d,4)]);
-    BOLD(subNum,:,:) = a_image(find(datlasR),:);
-
-    if nargin == 6
-        ph.XData = [0, subNum / nSub, subNum / nSub, 0];
-        jindu = sprintf('%.2f',subNum / nSub * 100);
-        app.ax.Title.String =[ 'loading subject nii file ' jindu '%...'];
-        drawnow
+if size(sub01nii, 1) == 0
+    cd('..')
+    sub01nii = dir('*.nii');
+    if size(sub01nii, 1) == 0
+        sub01nii = dir('*.nii.gz');
     end
 end
+
+[~, h] = NDN_Read(sub01nii.name);
+[nR, nT ,nSub] = size(BOLD);
 
 if nargin == 6
     app.ax.Title.String = 'Calculating SWISC...';
@@ -102,14 +104,15 @@ if nargin == 6
     drawnow
 end
 
-%% 2. save LOO mean TC in LOO_Mean_BOLD(nSub*volume*nT)
+%% 2. save LOO mean TC in LOO_Mean_BOLD(nVoxel, nT, nSub)
 parfor subNum = 1:numel(sublist)
     tmp = BOLD;
-    tmp(subNum, :, :)=[];
-    meanTmp=mean(tmp,1);
-    LOO_Mean_BOLD(subNum, :, :)=meanTmp;
+    tmp(:, :, subNum) = [];
+    meanTmp=mean(tmp, 3);
+    LOO_Mean_BOLD(:, :, subNum) = meanTmp;
 end
 clear("meanTmp") % for saving storage
+clear("tmp")
 
 %% 3. compute sliding window
 disp('Create sliding window time series');
@@ -139,7 +142,7 @@ for suba = 1:numel(sublist)
     %% Normalize within region, then divide it by the total stddev.
 
     % 4.1. get suba data，transpose, standardization
-    ats = squeeze(BOLD(suba,:,:));
+    ats = squeeze(BOLD(:, :, suba));
     % now the shape of ats: nt*nr，each column is the TC of a voxel/ROI
     ats = ats'; 
     % standardization of the TC of a voxel/ROI 
@@ -150,7 +153,7 @@ for suba = 1:numel(sublist)
 
     % 4.2 get the corresponding LOO_Mean_BOLD data of suba, do the same as
     % the above
-    bts = squeeze(LOO_Mean_BOLD(suba,:,:));
+    bts = squeeze(LOO_Mean_BOLD(:,:, suba));
     bts = bts';
     temp_bts = bts;
     temp_bts = temp_bts - repmat(mean(temp_bts), size(temp_bts, 1), 1); 
@@ -194,7 +197,6 @@ for suba = 1:numel(sublist)
     end
     swiscResult = swiscResult';% (Nwin*nr)
     [path, filename, ext] = fileparts(sublist(suba).name);
-    ssuba=sprintf('%02s',num2str(suba));
     %% 5. saving result
     % 5.1 save as mat file
     save([savepath_mat,'/swisc_' filename '.mat'], 'swiscResult', '-v7.3');

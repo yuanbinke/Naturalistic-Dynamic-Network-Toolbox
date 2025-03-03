@@ -1,26 +1,43 @@
 function [flag,errorsub] = computeISC(inputdir, prefix, grayMatterMask, savedDir, app)
-%computeISC  can compute n(n>=2) subject's Intersubject Correlation.
+% FORMAT: [flag, errorsub] = computeISC(inputdir, prefix, grayMatterMask, savedDir, app)
+% computeISC computes the Intersubject Correlation (ISC) for n (n >= 2) subjects.
+%
 % INPUT:
-% inputdir          - a directory which contains all the subject data. Each
-%                       subject 4D nii file is put in a subdirectory like
-%                       sub001/data_sub001.nii or or directly put in inputdir
-%                       like inputdir/data_sub001.nii
+%   inputdir        - A directory containing all subject data. Each subject's 
+%                     data is stored in a separate subdirectory. The expected 
+%                     structure is:
+%                     - sub001/func/data_sub001.nii(.gz), recommended or
+%                     - sub001/data_sub001.nii(.gz).
 %
-% prefix            - a String whose contents are decided by the target 
-%                     subdirectorys or files in inputdir
+%   prefix          - A string used to identify the target subdirectories 
+%                     or files within the inputdir. For example, if the 
+%                     subject directories are named 'sub001', 'sub002', etc., 
+%                     the prefix could be 'sub'.
 %
-% grayMatterMask    - the address of the grayMatter file
+%   grayMatterMask  - The file path to a gray matter mask file. This mask is 
+%                     used to extract time course data from the gray matter 
+%                     region of the functional images.
 %
-% savedDir          - Path for saved, optional argument, default content is
-%                     [inputdir filesep 'ISC-Result']
-% app               - a optional argument, is a uiobject
-% 
-% the output is the results of ISC which will be saved in savedDir
-% flag : -1 means the subject(errorsub) has no nii file
-%        0 means a incorrect prefix
-%        1 means finishing successfully
-% errorsub:represent the num of the subject(errorsub) which has no nii file
-% ,0 represents null
+%   savedDir        - (Optional) The directory path where the ISC results 
+%                     will be saved. If not provided, the default path is 
+%                     [inputdir filesep 'ISC-Result'].
+%
+%   app             - (Optional) A UI object (e.g., a progress bar or 
+%                     message display) for providing feedback during the 
+%                     execution of the function.
+%
+% OUTPUT:
+%   The results of the ISC computation are saved in the specified savedDir.
+%
+%   flag            - A status flag indicating the outcome of the function:
+%                     - -1: Indicates that the subject (specified by errorsub) 
+%                           has no .nii or .nii.gz file.
+%                     -  0: Indicates that the provided prefix is incorrect 
+%                           (no matching subdirectories or files were found).
+%                     -  1: Indicates that the function completed successfully.
+%
+%   errorsub        - The index of the subject that has no .nii or .nii.gz 
+%                     file. If no errors are found, this value is set to 0.
 
 if nargin == 3
     savedDir = fullfile(inputdir, 'ISC-Result');
@@ -29,28 +46,7 @@ if ~exist(savedDir,"dir")
     mkdir(savedDir)
 end
 
-
 sublist = getSublistByPrefixed(inputdir, prefix);
-
-if exist([inputdir filesep sublist(1).name]) == 7% 判断是否为文件夹或�?�直接是nii文件
-    inputType = 0; % 0代表 inputdir里面是许多子文件�?
-else
-    inputType = 1; % 1代表 inputdir里面是许多nii文件
-end
-if inputType == 1
-    for index = 1 : size(sublist, 1)
-        [pathstr, name, ext] = fileparts([inputdir filesep sublist(index).name]);
-        if strcmpi(ext,'.gz')
-            newSubDir = [pathstr filesep name(1:end-4)];
-        else
-            newSubDir = [pathstr filesep name];
-        end
-        mkdir(newSubDir)
-        movefile([inputdir filesep sublist(index).name], newSubDir)
-    end
-    inputType = 0;
-    sublist = getSublistByPrefixed(inputdir, prefix);
-end
 
 % load masks
 head_GM = spm_vol(grayMatterMask);
@@ -66,7 +62,7 @@ else
 end
 
 disp('loading done!!! ')
-%%
+%% Calculating ISC
 fprintf('Calculating ISC...')
 
 if nargin == 5

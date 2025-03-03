@@ -1,17 +1,42 @@
 function [flag,errorsub] = computeSFC(inputdir, prefix, ROIMask, app)
-% computeSFC() can compute n(n>=1) subject's static function connectivity by their ROI time course  
-% inputdir is the directory which  contains all the subject data，every
-%   subject 4D—nii file is put in a subdirectory like
-%   inputdir/sub001/data_sub001.nii or directly put in inputdir like inputdir/data_sub001.nii
-% prefix is decided by the target subdirectorys in inputdir
-% ROIMask is the address of the ROIMaks file
-% app, a optional argument, is a uiobject
-
-% the output is the results of SFC which will be save inputdir/SFC_Result
-% flag : -1 means the subject(errorsub) has no nii file
-%        0 means a incorrect prefix
-%        1 means finishing successfully
-% errorsub:represent the num of the subject(errorsub) which has no nii file
+%FORMAT [flag,errorsub] = computeSFC(inputdir, prefix, ROIMask, app)
+% computeSFC computes the Static Functional Connectivity (SFC) for n (n >= 1) 
+% subjects using their ROI time course data.
+%
+% INPUT:
+%   inputdir        - A directory containing all subject data. Each subject's 
+%                     data is stored in a separate subdirectory. The expected 
+%                     structure is:
+%                     - sub001/func/data_sub001.nii(.gz), recommended or
+%                     - sub001/data_sub001.nii(.gz).
+%
+%   prefix          - A string used to identify the target subdirectories 
+%                     within the inputdir. For example, if the subject 
+%                     directories are named 'sub001', 'sub002', etc., the 
+%                     prefix could be 'sub'.
+%
+%   ROIMask         - The file path to a mask file defining the regions of 
+%                     interest (ROIs). This mask is used to extract time 
+%                     course data from the specified ROIs.
+%
+%   app             - (Optional) A UI object (e.g., a progress bar or 
+%                     message display) for providing feedback during the 
+%                     execution of the function.
+%
+% OUTPUT:
+%   The results of the SFC computation are saved in the directory 
+%   inputdir/SFC_Result.
+%
+%   flag            - A status flag indicating the outcome of the function:
+%                     - -1: Indicates that the subject (specified by errorsub) 
+%                           has no .nii or .nii.gz file.
+%                     -  0: Indicates that the provided prefix is incorrect 
+%                           (no matching subdirectories or files were found).
+%                     -  1: Indicates that the function completed successfully.
+%
+%   errorsub        - The index of the subject that has no .nii or .nii.gz 
+%                     file. If no errors are found, this value is set to 0.
+%
 
 
 desdir=[inputdir filesep 'SFC_Result'];
@@ -33,6 +58,7 @@ if nargin == 4
     app.ax.Title.String = 'Calculating SFC...';
     app.ax.Color = [0.9375, 0.9375, 0.3375];
     ph = patch(app.ax,[0, 0, 0, 0], [0, 0, 1, 1], [0.6745, 1, 0.8045]);
+    drawnow
 end
 Nsub = length(sublist);
 for subNum = 1:size(sublist, 1)

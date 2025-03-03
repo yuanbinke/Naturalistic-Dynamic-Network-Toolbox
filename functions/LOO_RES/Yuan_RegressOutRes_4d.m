@@ -10,9 +10,23 @@ function Yuan_RegressOutRes_4d(DataDir, Mean4Dfile, dataType, MaskFilename)
 % Output: 
 %   The result will finally be saved in 'DataDir \ LOO_ResReg'
 
+if ~exist([DataDir filesep 'func'])
+    mkdir([DataDir filesep 'func'])
+end 
+cd([DataDir filesep 'func']);
 
-cd(DataDir)
 nii4dfile = dir('*.nii');
+if size(nii4dfile, 1) == 0
+    nii4dfile = dir('*.nii.gz');
+end
+if size(nii4dfile, 1) == 0
+    cd('..')
+    nii4dfile = dir('*.nii');
+    if size(nii4dfile, 1) == 0
+        nii4dfile = dir('*.nii.gz');
+    end
+end
+
 [AllVolume, Header] = NDN_Read(nii4dfile.name);
 [nDim1, nDim2, nDim3, nDim4]=size(AllVolume);
 
@@ -58,8 +72,8 @@ VolumeAfterRemoveCov(isnan(VolumeAfterRemoveCov))=0;
 VolumeResting(isnan(VolumeResting))=0;
 
 
-% VolumeAfterRemoveCov = VolumeAfterRemoveCov + repmat(MeanBrain,[1,1,1,nDim4]); %%Add the mean back.
-% VolumeResting = VolumeResting + repmat(MeanBrain,[1,1,1,nDim4]); %%Add the mean back.
+VolumeAfterRemoveCov = VolumeAfterRemoveCov + repmat(MeanBrain,[1,1,1,nDim4]); %%Add the mean back.
+VolumeResting = VolumeResting + repmat(MeanBrain,[1,1,1,nDim4]); %%Add the mean back.
 
 taskSaveDir = [DataDir filesep 'LOO_ResReg' filesep 'Task'];
 restingSaveDir = [DataDir filesep 'LOO_ResReg' filesep 'Resting'];

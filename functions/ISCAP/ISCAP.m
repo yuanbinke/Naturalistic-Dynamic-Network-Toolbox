@@ -86,14 +86,28 @@ if ~exist(savedDir, 'dir')
 end
 
 runName = params.runName;
+if ~exist([workingDir filesep subList(1).name filesep 'func'])
+    mkdir([workingDir filesep subList(1).name filesep 'func'])
+end
+cd([workingDir filesep subList(1).name filesep 'func']);
 
+firstNIIFile = dir('*.nii');
+if size(firstNIIFile, 1) == 0
+    firstNIIFile = dir('*.nii.gz');
+end
+if size(firstNIIFile, 1) == 0
+    cd('..')
+    firstNIIFile = dir('*.nii');
+    if size(firstNIIFile, 1) == 0
+        firstNIIFile = dir('*.nii.gz');
+    end
+end
 if isfield(params, "TR")
     params.TR = str2double(params.TR);
     TR = params.TR;
 else
-    cd([workingDir filesep subList(1).name])
-    firstNIIFile = dir('*nii');
-    [~, h] = NDN_Read([workingDir filesep subList(1).name filesep firstNIIFile(1).name], 1);
+
+    [~, h] = NDN_Read(firstNIIFile(1).name, 1);
     if size(h.PixelDimensions, 2) == 4
         TR = h.PixelDimensions(1, 4);
     else
@@ -119,10 +133,8 @@ STDCAP = [];
 
 n_rep = 20;
 %% loading hrd
-cd([workingDir filesep subList(1).name])
-firstNIIFile = dir('*.nii');
 
-allHead = spm_vol([workingDir filesep subList(1).name filesep firstNIIFile(1).name]);
+allHead = spm_vol(firstNIIFile(1).name);
 brain_info = {};
 brain_info{1}=allHead(1);
 
@@ -151,8 +163,23 @@ end
 for i = 1:size(subList,1)
 
     disp(['Currently loading subject ',num2str(i),'...']);
-    cd([workingDir filesep subList(i).name])
+
+    if ~exist([workingDir filesep subList(i).name filesep 'func'])
+        mkdir([workingDir filesep subList(i).name filesep 'func'])
+    end
+    cd([workingDir filesep subList(i).name filesep 'func']);
+
     NIIFile = dir('*.nii');
+    if size(NIIFile, 1) == 0
+        NIIFile = dir('*.nii.gz');
+    end
+    if size(NIIFile, 1) == 0
+        cd('..')
+        NIIFile = dir('*.nii');
+        if size(NIIFile, 1) == 0
+            NIIFile = dir('*.nii.gz');
+        end
+    end
 
     tmp_data = [];
     [d, ~]=NDN_Read(NIIFile(1).name);
@@ -216,9 +243,9 @@ brain = CAP_V2V(brain,Underlay_info.dim,...
 % Xonp and Xonn contain the frames (deactivation frames have been
 % switched in sign, so that deactivation is positive)
 % Xonp 保存剩下的帧，大小为 1 * nsub的cell数组，每个cell里面是剩下的TR * nvoxel
-% p�?3*nsub的double，第�?第二行是相同的，提剔除的时间帧占�?
-% 第三�? = 1-第一�?
-% Indices 1*1的结构体�?3个字段�?? 其中srubbed是nt * nsub  的logic，记录某个人被剔除的
+% p�?3*nsub的double，第�?第二行是相同的，提剔除的时间帧占�?
+% 第三�? = 1-第一�?
+% Indices 1*1的结构体�?3个字段�?? 其中srubbed是nt * nsub  的logic，记录某个人被剔除的
 % 的时间点,Indices.scrubbed==Indices.scrubbedandactive
 % Indices.kept.active = ~Indices.scrubbed
 Xonp = {};

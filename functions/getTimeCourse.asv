@@ -104,29 +104,12 @@ if Nsub == 0
 end
 
 
-if ~exist([inputdir filesep sublist(1).name filesep 'func'])
-    mkdir([inputdir filesep sublist(1).name filesep 'func'])
-end 
 cd([inputdir filesep sublist(1).name filesep 'func']);
 
 subNiiFile = dir('*.nii');
 if size(subNiiFile, 1) == 0
     subNiiFile = dir('*.nii.gz');
 end
-if size(subNiiFile, 1) == 0
-    cd('..')
-    subNiiFile = dir('*.nii');
-    if size(subNiiFile, 1) == 0
-        subNiiFile = dir('*.nii.gz');
-    end
-end
-
-if size(subNiiFile,1) == 0 % there is no nii file in subject subnum
-    flag = -1;
-    errorsub = subNum;
-    error(['there is no .nii or .nii.gz file in' sublist(1).name])
-end
-
 
 [~, subHead] = NDN_Read(subNiiFile(1).name);
 Ntime = subHead.ImageSize(4);
@@ -148,9 +131,7 @@ if nargin == 4
 end
 for subNum = 1:Nsub
     fprintf('..');
-    if ~exist([inputdir filesep sublist(subNum).name filesep 'func'])
-        mkdir([inputdir filesep sublist(subNum).name filesep 'func'])
-    end 
+
     cd([inputdir filesep sublist(subNum).name filesep 'func'])
 
     % In the /func directory, find the first .nii file. If no .nii file exists,
@@ -175,7 +156,7 @@ for subNum = 1:Nsub
         error(['there is no .nii or .nii.gz file in' sublist(subNum).name])
     end
 
-    [volData, volInfo] = NDN_Read(dfile(1).name);
+    [volData, volInfo] = NDN_Read([inputdir filesep sublist(subNum).name filesep dfile(1).name]);
     
     d_reshape = reshape(volData, [size(volData,1)*size(volData,2)*size(volData,3), size(volData,4)]);
     if all(size(d_GM) ~= size(squeeze(volData(:,:,:,1))))
