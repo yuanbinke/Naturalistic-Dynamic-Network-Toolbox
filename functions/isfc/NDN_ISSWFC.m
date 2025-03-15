@@ -59,7 +59,7 @@ end
 cd(inputdir)
 fileList = dir('*.mat');
 
-% load data （nt *  nr * nsub�?
+% load data （nt *  nr * nsub�?
 data=read_2Dmat_2_3DmatrixROITC(inputdir);
 N_sub = size(data, 3);
 N_time = size(data, 1);
@@ -140,15 +140,35 @@ end%s
 
 cd(savedDir)
 % transform dFC_result's shape 
-% from [N_time*N_sub, size(dFC_result, 2)] ===> [N_time, size(dFC_result, 2), N_sub]
+% from [N_win*N_sub, size(dFC_result, 2)] ===> [N_win, size(dFC_result, 2), N_sub]
 dFC_result1 = reshape(dFC_result, [size(dFC_result, 1) / N_sub, N_sub, size(dFC_result, 2)]);
 dFC_result2 = zeros(size(dFC_result, 1) / N_sub, size(dFC_result, 2), N_sub);
 for i = 1:size(dFC_result, 1) / N_sub
     dFC_result2(i, :, :) = squeeze(dFC_result1(i, :, :))';
 end
 
+%%
+% dFC_result3 = zeros(size(dFC_result, 1)/ N_sub, N_roi * N_roi, N_sub);
+% for x = 1:N_sub
+%     for y = 1:size(dFC_result, 1)/ N_sub % 1:N_win
+%         tmp = squeeze(dFC_result2(y, :, x));
+
+%         if isfield(res, "ISA_type") && isequal(res.ISA_type, 'LOO')
+%             tmp_state=sf_vec2mat_Asy(N_roi, tmp);
+%         else
+%             tmp_state=sf_vec2mat(N_roi, tmp);
+%             tmp_state=tmp_state+tmp_state';
+%         end
+
+%         dFC_result3(y, :, x)
+%     end
+% end
+
+
+
 res.SP = SP;
 res.dFC_result = dFC_result;
+res.dFC_result_3D = dFC_result2;
 res.method = methodType;
 res.TR = params.TR;
 res.N_sub = N_sub;
@@ -157,12 +177,12 @@ if exist("ISA_type", "var")
     res.ISA_type = ISA_type;
 end
 if exist("ISA_type","var")
-    write_3DmatrixROITC_2_2Dmat(dFC_result2, savedDir, fileList, [methodType '_' ISA_type])
+    %write_3DmatrixROITC_2_2Dmat(dFC_result2, savedDir, fileList, [methodType '_' ISA_type])
     save([methodType '_' ISA_type '_all.mat'], 'res', '-v7.3')
 
 
 else
-    write_3DmatrixROITC_2_2Dmat(dFC_result2, savedDir, fileList, methodType)
+    %write_3DmatrixROITC_2_2Dmat(dFC_result2, savedDir, fileList, methodType)
     save([methodType '_all.mat'], 'res', '-v7.3')
 
 end
