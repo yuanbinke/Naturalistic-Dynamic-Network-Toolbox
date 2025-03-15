@@ -81,6 +81,7 @@ for i=1:K
     close(gcf)
     % save as mat
     state_i_mat_name = fullfile(savedDir, [prefix '_state0' num2str(i) '.mat'] ) ;
+    OUTPUT.ploting.K_State.(sprintf('state%02d', i)) = tmp_state;
     save(state_i_mat_name, 'tmp_state')
 end
 
@@ -158,8 +159,26 @@ stateSeriesCorrelation_tif_name = fullfile(savedDir, [prefix '_stateSeriesCorrel
 print(gcf, '-dtiff', '-r300', stateSeriesCorrelation_tif_name);
 close(gcf)
 % save as mat
-stateSeriesCorrelation_mat_name = fullfile(savedDir, [prefix 'stateSeriesCorrelation.mat'] );
+stateSeriesCorrelation_mat_name = fullfile(savedDir, [prefix '_stateSeriesCorrelation.mat'] );
 save(stateSeriesCorrelation_mat_name, 'correlation_matrix')
+
+%% save as mat 
+
+OUTPUT.info = app.info;
+
+OUTPUT.clusterInfo.K = app.K;
+OUTPUT.clusterInfo.dMethod = app.dMethod;
+
+OUTPUT.stateTransition = app.stateTransition;
+OUTPUT.median = app.median;
+OUTPUT.mean = app.mean;
+
+OUTPUT.ploting.stateSeriesCorrelation = correlation_matrix;
+OUTPUT.ploting.transitionProbability = state_to_state;
+OUTPUT.ploting.stateFrequency = stateFrequency;
+
+outputName = fullfile(savedDir, [prefix '_cluster_plotting_output.mat'] );
+save(outputName, 'OUTPUT')
 
 end
 
