@@ -46,7 +46,7 @@ if ~isfield(params, "TR")
 end
 cd(inputdir)
 fileList = dir('*.mat');
-%         load data 锛坣t *  nr * nsub锛?
+%         load data （nt *  nr * nsub�?
 data=read_2Dmat_2_3DmatrixROITC(inputdir);
 N_sub = size(data, 3);
 N_time = size(data, 1);
@@ -117,7 +117,10 @@ for s=1:N_sub
 
     end
 
-    tmp_dFC=tmp_dFC_DCCX;
+    tmp_dFC = tmp_dFC_DCCX;
+    for edge_i = 1:size(tmp_dFC_DCCX, 2)
+        tmp_dFC(:, edge_i) = atanh(tmp_dFC_DCCX(:, edge_i));
+    end
     DEV = std(tmp_dFC, [], 2);%STD OF NODE
     [xmax, imax, xmin, imin] = icatb_extrema(DEV);%local maxima in FC variance
     pIND = sort(imax);%?
@@ -143,26 +146,27 @@ for i = 1:size(dFC_result, 1)/ N_sub
     dFC_result2(i, :, :) = squeeze(dFC_result1(i, :, :))';
 end
 %%
-dFC_result3 = zeros(size(dFC_result, 1)/ N_sub, N_roi, N_sub);
-for x = 1:N_sub
-    for y = 1:size(dFC_result, 1)/ N_sub
-        tmp = squeeze(dFC_result2(y, :, x));
+% dFC_result3 = zeros(size(dFC_result, 1)/ N_sub, N_roi * N_roi, N_sub);
+% for x = 1:N_sub
+%     for y = 1:size(dFC_result, 1)/ N_sub % 1:N_win
+%         tmp = squeeze(dFC_result2(y, :, x));
 
-        if isfield(res, "ISA_type") && isequal(res.ISA_type, 'LOO')
-            tmp_state=sf_vec2mat_Asy(N_roi, tmp);
-        else
-            tmp_state=sf_vec2mat(N_roi, tmp);
-            tmp_state=tmp_state+tmp_state';
-        end
+%         if isfield(res, "ISA_type") && isequal(res.ISA_type, 'LOO')
+%             tmp_state=sf_vec2mat_Asy(N_roi, tmp);
+%         else
+%             tmp_state=sf_vec2mat(N_roi, tmp);
+%             tmp_state=tmp_state+tmp_state';
+%         end
 
-
-    end
-end
+%         dFC_result3(y, :, x)
+%     end
+% end
 
 
 
 res.SP = SP;
 res.dFC_result = dFC_result;
+res.dFC_result_3D = dFC_result2;
 res.method = methodType;
 res.TR = params.TR;
 res.N_sub = N_sub;
@@ -171,10 +175,10 @@ if exist("ISA_type", "var")
     res.ISA_type = ISA_type;
 end
 if exist("ISA_type","var")
-    write_3DmatrixROITC_2_2Dmat(dFC_result2, savedDir, fileList, [methodType '_' ISA_type])
+    %write_3DmatrixROITC_2_2Dmat(dFC_result2, savedDir, fileList, [methodType '_' ISA_type])
     save([methodType '_' ISA_type '_all.mat'], 'res', '-v7.3')
 else
-    write_3DmatrixROITC_2_2Dmat(dFC_result2, savedDir, fileList, methodType)
+    %write_3DmatrixROITC_2_2Dmat(dFC_result2, savedDir, fileList, methodType)
     save([methodType '_all.mat'], 'res', '-v7.3')
 end
 

@@ -118,6 +118,9 @@ for s=1:N_sub
 
     %%
     tmp_dFC = tmp_dFC_DCCX;
+    for edge_i = 1:size(tmp_dFC_DCCX, 2)
+        tmp_dFC(:, edge_i) = atanh(tmp_dFC_DCCX(:, edge_i));
+    end
     DEV = std(tmp_dFC, [], 2);%STD OF NODE
     [xmax, imax, xmin, imin] = icatb_extrema(DEV);%local maxima in FC variance
     pIND = sort(imax);%?

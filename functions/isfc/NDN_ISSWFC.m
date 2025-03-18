@@ -122,13 +122,16 @@ for s=1:N_sub
     end
 
     %%
-    tmp_CT2=tmp_dFC_DCCX;
-    DEV = std(tmp_CT2, [], 2);%STD OF NODE
+    tmp_dFC = tmp_dFC_DCCX;
+    for edge_i = 1:size(tmp_dFC_DCCX, 2)
+        tmp_dFC(:, edge_i) = atanh(tmp_dFC_DCCX(:, edge_i));
+    end
+    DEV = std(tmp_dFC, [], 2);%STD OF NODE
     [xmax, imax, xmin, imin] = icatb_extrema(DEV);%local maxima in FC variance
     pIND = sort(imax);%?
     k1_peaks(s) = length(pIND);% ?
-    SP{s,1} = tmp_CT2(pIND, :);% Subsampling
-    dFC_result = [dFC_result;tmp_CT2];
+    SP{s,1} = tmp_dFC(pIND, :);% Subsampling
+    dFC_result = [dFC_result; tmp_dFC];
 
     if nargin == 4
         ph.XData = [0, s / N_sub, s / N_sub, 0];
