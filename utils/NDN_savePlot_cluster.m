@@ -85,23 +85,23 @@ for i=1:K
     save(state_i_mat_name, 'tmp_state')
 end
 
-%% stateFrequency
+%% stateRatio
 figure
-stateFrequency = histcounts(stateTransition(:), 1:K+1) / numel(stateTransition);
-bar(stateFrequency, 0.5);
-ylim([0, max(stateFrequency) + 0.1]);
+stateRatio = histcounts(stateTransition(:), 1:K+1) / numel(stateTransition);
+bar(stateRatio, 0.5);
+ylim([0, max(stateRatio) + 0.1]);
 xlim([0.5, K + 0.5]);
 
-title('Overall state frequency')
+title('State ratio')
 set(gca, 'XTick', 1:K, 'XTickLabel', TickLabel)
 
 % save as tif
-stateFrequency_tif_name = fullfile(savedDir, [prefix '_stateFrequency.tif'] );
+stateFrequency_tif_name = fullfile(savedDir, [prefix '_stateRatio.tif'] );
 print(gcf, '-dtiff', '-r300', stateFrequency_tif_name);
 close(gcf)
 % save as mat
-stateFrequency_mat_name = fullfile(savedDir, [prefix '_stateFrequency.mat'] );
-save(stateFrequency_mat_name, 'stateFrequency')
+stateFrequency_mat_name = fullfile(savedDir, [prefix '_stateRatio.mat'] );
+save(stateFrequency_mat_name, 'stateRatio')
 
 %% Transition probability
 states = unique(stateTransition); 
@@ -114,7 +114,7 @@ for s = 1:nSub
         state_to_state(current_state, next_state) = state_to_state(current_state, next_state) + 1;
     end
 end
-
+state_to_state = state_to_state ./ sum(state_to_state, "all");
 figure
 imagesc(state_to_state)
 colormap(flipud(gray));
@@ -151,19 +151,42 @@ imagesc(correlation_matrix);
 colormap(jet);
 caxis([-1 1]); 
 colorbar;
-title('Between subject state correlation');
+title('Subjects correlation');
 set(gca, 'FontName','Arial','FontSize', 12);
 
 % save as tif
-stateSeriesCorrelation_tif_name = fullfile(savedDir, [prefix '_stateSeriesCorrelation.tif'] );
+stateSeriesCorrelation_tif_name = fullfile(savedDir, [prefix '_subjectsStateSeriesCorrelation.tif'] );
 print(gcf, '-dtiff', '-r300', stateSeriesCorrelation_tif_name);
 close(gcf)
 % save as mat
-stateSeriesCorrelation_mat_name = fullfile(savedDir, [prefix '_stateSeriesCorrelation.mat'] );
+stateSeriesCorrelation_mat_name = fullfile(savedDir, [prefix '_subjectsStateSeriesCorrelation.mat'] );
 save(stateSeriesCorrelation_mat_name, 'correlation_matrix')
 
-%% save as mat 
+%% state variability for every subject
+% get attributes array
+fields = fieldnames(app.variability);
 
+for attribute_i = 1:numel(fields)
+    fieldName = fields{i};
+    variability_matrix = app.variability.(fieldName);
+
+    figure;
+    imagesc(variability_matrix);
+    colormap(jet);
+    caxis([-1 1]);
+    colorbar;
+    title([fieldName 'variability']);
+    set(gca, 'FontName','Arial','FontSize', 12);
+
+    % save as tif
+    variability_tif_name = fullfile(savedDir, ['/variability/' fieldName '_' prefix '_variability.tif'] );
+    print(gcf, '-dtiff', '-r300', variability_tif_name);
+    close(gcf)
+    % save as mat
+    variability_mat_name = fullfile(savedDir, ['/variability/' fieldName '_' prefix '_variability.mat'] );
+    save(variability_mat_name, 'variability_matrix')
+end
+%% save as mat 
 OUTPUT.info = app.info;
 
 OUTPUT.clusterInfo.K = app.K;
@@ -172,10 +195,11 @@ OUTPUT.clusterInfo.dMethod = app.dMethod;
 OUTPUT.stateTransition = app.stateTransition;
 OUTPUT.median = app.median;
 OUTPUT.mean = app.mean;
+OUTPUT.variability = app.variability;
 
 OUTPUT.ploting.stateSeriesCorrelation = correlation_matrix;
 OUTPUT.ploting.transitionProbability = state_to_state;
-OUTPUT.ploting.stateFrequency = stateFrequency;
+OUTPUT.ploting.stateRatio = stateRatio;
 
 outputName = fullfile(savedDir, [prefix '_cluster_plotting_output.mat'] );
 save(outputName, 'OUTPUT')

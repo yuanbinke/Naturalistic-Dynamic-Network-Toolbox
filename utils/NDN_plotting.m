@@ -46,13 +46,13 @@ app.UIAxes3_1.YLim = [0, max(stateFrequency) + 0.1];
 app.UIAxes3_1.XLim = [0.5, K + 0.5];
 app.UIAxes3_1.XTick = 1:1:K;
 app.UIAxes3_1.XTickLabel = TickLabel;
-app.UIAxes3_1.Title.String = "Overall state frequency";
+app.UIAxes3_1.Title.String = "State ratio";
 
 app.UIAxes3_1.Visible = 'on';
 
-% app.UIAxes3_1.YAxis.Visible = 'on';
-% app.UIAxes3_1.XAxis.Visible = 'on';
-% app.UIAxes3_1.Title.Visible = 'on';
+app.UIAxes3_1.YAxis.Visible = 'on';
+app.UIAxes3_1.XAxis.Visible = 'on';
+app.UIAxes3_1.Title.Visible = 'on';
 
 %% 
 %% plotting Transition probability
@@ -89,10 +89,14 @@ app.UIAxes3_2.TickLength = [0 0];
 app.UIAxes3_2.Title.String = "Transition probability between states";
 
 app.UIAxes3_2.Visible = 'on';
+
+app.UIAxes3_2.YAxis.Visible = 'on';
+app.UIAxes3_2.XAxis.Visible = 'on';
+app.UIAxes3_2.Title.Visible = 'on';
+
 cbar = colorbar(app.UIAxes3_2);
 app.cbar.UIAxes3_2 = cbar;
 %% plotting correlation matrix
-
 correlation_matrix = corrcoef(stateTransition');
 imagesc(app.UIAxes3_3, correlation_matrix);
 myJet = importdata("myJet.mat");
@@ -103,7 +107,7 @@ app.UIAxes3_3.XLim = [0.5, nSub+0.5];
 app.UIAxes3_3.YLim = [0.5, nSub+0.5];
 
 
-app.UIAxes3_3.Title.String = "Between subject state correlation";
+app.UIAxes3_3.Title.String = "Subjects correlation";
 app.UIAxes3_3.YAxis.Visible = 'off';
 app.UIAxes3_3.XAxis.Visible = 'off';
 app.UIAxes3_3.Title.Visible = 'on';
