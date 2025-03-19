@@ -8,7 +8,7 @@ function NullMdlData = NDN_generateNullMldData(TC, params)
 %                     (Regions of Interest), and nSub represents the number
 %                     of subjects.
 % params            - A structure containing relevant parameters of ISSWFC
-%   nullMdl         - An Optional Attribute, using an empty model to
+%   nullMdl         - An Attribute, using an empty model to
 %                     generate data, its values can be either 'ar' or 'pr'.
 %                     It will call the Phase Randomized or Multivariate ARR
 %                     model to generate additional data, and optionally

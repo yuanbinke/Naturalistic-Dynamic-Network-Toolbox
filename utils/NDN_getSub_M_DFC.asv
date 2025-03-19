@@ -37,10 +37,6 @@ function NDN_getSub_M_DFC(app)
 %                      of the k-th state for the first subject is saved in
 %                      app.median.sub01 = submedian, where submedian has the
 %                      shape (N_roi, N_roi, K).
-%    app.variability   - A structure containing the std values for each
-%                      subject . For example, the std value for the first subject is saved in
-%                      app.variability.sub01 = subvariability, where subvariability has the
-%                      shape (N_roi, N_roi).
 
 stateTransition = app.stateTransition;
 allState = app.allState;
@@ -69,9 +65,12 @@ for sub = 1:N_sub
     % Check if LOO method is used
     if isfield(app.info, "ISA_type") && isequal(app.info.ISA_type, 'LOO')
         subvariability = sf_vec2mat_Asy(N_roi, tmpSubvariability(:));
+%         tmp_state_medium = sf_vec2mat_Asy(N_roi, tmpSubMedium(:));
     else
-        subvariability = sf_vec2mat(N_roi, tmpSubvariability(:));
-        subvariability = subvariability + subvariability';
+        tmp_state_mean = sf_vec2mat(N_roi, tmpSubMean(:));
+        tmp_state_mean = tmp_state_mean + tmp_state_mean';
+        tmp_state_medium = sf_vec2mat(N_roi, tmpSubMedium(:));
+        tmp_state_medium = tmp_state_medium + tmp_state_medium';
     end
     % Loop through each state
     for k = 1:K
