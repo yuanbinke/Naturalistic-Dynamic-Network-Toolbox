@@ -118,6 +118,7 @@ for s=1:N_sub
     end
 
     tmp_dFC = tmp_dFC_DCCX;
+    tmp_dFC_DCCX = normalize_to_minus_one_plus_one(tmp_dFC_DCCX);
     for edge_i = 1:size(tmp_dFC_DCCX, 2)
         tmp_dFC(:, edge_i) = atanh(tmp_dFC_DCCX(:, edge_i));
     end
