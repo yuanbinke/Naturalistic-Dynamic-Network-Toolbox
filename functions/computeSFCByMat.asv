@@ -33,25 +33,27 @@ end
 
 Nsub = length(fileList);
 for subNum = 1:size(fileList, 1)
-    ii = sprintf('%02d', subNum);
     fprintf('..')
     subtc = squeeze(ROI_TC(:, :, subNum));%time * ROI
     corr_matrix = corr(subtc, subtc);
     SFC = 0.5 * log((1 + corr_matrix) ./ (1 - corr_matrix));
     SFC(logical(eye(size(SFC)))) = 0;% set diagonal to 0
-    
+
+
+
+
     fig = figure('Visible', 'off');
-    imagesc(SFC);
+    imagesc(variability_matrix);
     colormap(jet);
     caxis([-1 1]);
     colorbar;
-    title(['SFC']);
+    title(['Variability ' fieldName]);
     set(gca, 'FontName','Arial','FontSize', 12);
+    if ~exist([savedDir '/variability'], "dir")
+        mkdir([savedDir '/variability'])
+    end
 
-    % save as tif
-    sfc_tif_name = fullfile(savedDir, fullfile(desdir, [name '.tif']));
-    print(fig, '-dtiff', '-r300', sfc_tif_name);
-    close(fig)
+
 
     [~, name, ~] = fileparts(fileList(subNum).name);
     resultName = fullfile(desdir, [name '.mat']);

@@ -58,6 +58,7 @@ save([savedDir filesep  prefix '_stateTransition.mat'], "stateTransition");
 %% save states
 % plot K state figure
 for i=1:K
+    ii = sprintf('%02d', i);
     tmp_state = squeeze(allState(:,:,i));
     tmp_state_normalized = normalize(tmp_state, 'range', [-1, 1]);
     figure
@@ -65,7 +66,7 @@ for i=1:K
     colormap(gradientColors)
     colorbar
     caxis([min(tmp_state_normalized(:)), max(tmp_state_normalized(:))])
-    title(['state0' num2str(i)])
+    title(['State ' ii])
 
     nROI = size(tmp_state_normalized, 1);
     span = floor(nROI / 4);
