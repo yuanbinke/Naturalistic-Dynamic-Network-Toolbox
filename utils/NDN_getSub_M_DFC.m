@@ -111,7 +111,7 @@ for sub = 1:N_sub
     app.median.(sprintf(['sub%0' num 'd'], sub)) = submedian;
     app.variability.(sprintf(['sub%0' num 'd'], sub)) = subvariability;
 
-    res = app
+    res = app;
 end
 
 end
