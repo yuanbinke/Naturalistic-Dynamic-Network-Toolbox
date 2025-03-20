@@ -39,7 +39,7 @@ for subNum = 1:size(fileList, 1)
     corr_matrix = corr(subtc, subtc);
     SFC = 0.5 * log((1 + corr_matrix) ./ (1 - corr_matrix));
     SFC(logical(eye(size(SFC)))) = 0;% set diagonal to 0
-    
+
     fig = figure('Visible', 'off');
     imagesc(SFC);
     colormap(jet);
@@ -49,7 +49,7 @@ for subNum = 1:size(fileList, 1)
     set(gca, 'FontName','Arial','FontSize', 12);
 
     % save as tif
-    sfc_tif_name = fullfile(savedDir, fullfile(desdir, [name '.tif']));
+    sfc_tif_name = fullfile(desdir, [name '.tif']);
     print(fig, '-dtiff', '-r300', sfc_tif_name);
     close(fig)
 
