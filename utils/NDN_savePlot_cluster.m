@@ -177,7 +177,9 @@ for attribute_i = 1:numel(fields)
     colorbar;
     title([fieldName 'variability']);
     set(gca, 'FontName','Arial','FontSize', 12);
-
+    if ~exist([savedDir '/variability'], "dir")
+        mkdir([savedDir '/variability'])
+    end
     % save as tif
     variability_tif_name = fullfile(savedDir, ['/variability/' fieldName '_' prefix '_variability.tif'] );
     print(gcf, '-dtiff', '-r300', variability_tif_name);
