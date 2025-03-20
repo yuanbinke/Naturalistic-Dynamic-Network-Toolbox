@@ -170,20 +170,20 @@ for attribute_i = 1:numel(fields)
     fieldName = fields{attribute_i};
     variability_matrix = app.variability.(fieldName);
 
-    figure;
+    fig = figure('Visible', 'off');
     imagesc(variability_matrix);
     colormap(jet);
     caxis([-1 1]);
     colorbar;
-    title([fieldName ' Variability']);
+    title(['Variability ' fieldName]);
     set(gca, 'FontName','Arial','FontSize', 12);
     if ~exist([savedDir '/variability'], "dir")
         mkdir([savedDir '/variability'])
     end
     % save as tif
     variability_tif_name = fullfile(savedDir, ['/variability/' fieldName '_' prefix '_variability.tif'] );
-    print(gcf, '-dtiff', '-r300', variability_tif_name);
-    close(gcf)
+    print(fig, '-dtiff', '-r300', variability_tif_name);
+    close(fig)
     % save as mat
     variability_mat_name = fullfile(savedDir, ['/variability/' fieldName '_' prefix '_variability.mat'] );
     save(variability_mat_name, 'variability_matrix')
