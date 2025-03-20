@@ -1,7 +1,7 @@
 function mat=sf_vec2mat_Asy(V,vec)
 vec=vec(:);
 mat=zeros(V,V);
-k=0;
+
 for i=1:V
         mat(i,:)=vec((i-1)*V+1:i*V);
 end
