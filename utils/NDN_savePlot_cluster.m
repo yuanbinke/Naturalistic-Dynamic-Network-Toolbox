@@ -175,7 +175,7 @@ for attribute_i = 1:numel(fields)
     colormap(jet);
     caxis([-1 1]);
     colorbar;
-    title([fieldName 'variability']);
+    title([fieldName ' Variability']);
     set(gca, 'FontName','Arial','FontSize', 12);
     if ~exist([savedDir '/variability'], "dir")
         mkdir([savedDir '/variability'])
