@@ -167,7 +167,7 @@ save(stateSeriesCorrelation_mat_name, 'correlation_matrix')
 fields = fieldnames(app.variability);
 
 for attribute_i = 1:numel(fields)
-    fieldName = fields{i};
+    fieldName = fields{attribute_i};
     variability_matrix = app.variability.(fieldName);
 
     figure;
