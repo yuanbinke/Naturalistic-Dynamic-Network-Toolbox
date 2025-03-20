@@ -1,4 +1,4 @@
-function NDN_getSub_M_DFC(app)
+function res = NDN_getSub_M_DFC(app)
 % FORMAT NDN_getSub_M_DFC(app)
 % NDN_getSub_M_DFC calculates the mean and median values for each of the k
 % states for every subject. Also, If calculates the variability for each subject. 
@@ -111,6 +111,7 @@ for sub = 1:N_sub
     app.median.(sprintf(['sub%0' num 'd'], sub)) = submedian;
     app.variability.(sprintf(['sub%0' num 'd'], sub)) = subvariability;
 
+    res = app
 end
 
 end
