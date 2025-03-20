@@ -48,16 +48,16 @@ for subNum = 1:size(fileList, 1)
     title(['SFC']);
     set(gca, 'FontName','Arial','FontSize', 12);
 
-    % save as tif
-    sfc_tif_name = fullfile(desdir, [name '.tif']);
-    print(fig, '-dtiff', '-r300', sfc_tif_name);
-    close(fig)
+
 
     [~, name, ~] = fileparts(fileList(subNum).name);
     resultName = fullfile(desdir, [name '.mat']);
     save(resultName, "SFC");
 
-
+    % save as tif
+    sfc_tif_name = fullfile(desdir, [name '.tif']);
+    print(fig, '-dtiff', '-r300', sfc_tif_name);
+    close(fig)
     
     if nargin == 3
         ph.XData = [0, subNum / Nsub, subNum / Nsub, 0];
