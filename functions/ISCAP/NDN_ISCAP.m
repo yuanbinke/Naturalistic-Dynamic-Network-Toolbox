@@ -38,7 +38,7 @@ function bestK = NDN_ISCAP(inputDir, prefix, grayMatterMask, savedDir, params, a
 % you only need to fill in the following parameters. Once these parameters
 % are provided, ISCAP / CAP values will not be calculated, and instead,
 % a best K value will be returned.
-%
+%   params.isBestK  -  A boolean value specifying whether to calculate the best K. 
 %   params.Kmax     -  a number in the range [2, 12]. Once you specify this
 %                      Kmax, the function will calculate the best K value
 %                      within the range [2, Kmax].
@@ -75,23 +75,29 @@ if params.Tmot < 0
     error("The minimum value of params.Tmot should be greater than 0.")
 end
 
-isBestK = false;
-if isfield(params, 'Kmax') && isfield(params, 'Pcc') && isfield(params, 'N')
-    isBestK = true;
-    if params.Kmax > 12 || params.Kmax < 2
-        error("The range of k should be within [2, 12].")
+if isfield(params, 'isBestK') && params.isBestK
+    if isfield(params, 'Kmax') && isfield(params, 'Pcc') && isfield(params, 'N')
+        isBestK = true;
+        if params.Kmax > 12 || params.Kmax < 2
+            error("The range of k should be within [2, 12].")
+        end
+        if params.Pcc > 100 || params.Pcc < 50
+            error("The range of Pcc should be within [50, 100].")
+        end
+        if params.N < 0
+            error("The minimum value of params.N should be greater than 0.")
+        end
+        Kmax = params.Kmax;
+        Pcc = params.Pcc;
+        N = params.N;
+    else
+        error("If you want to execute the best K, then check whether these three parameters " + ...
+            " 'params.Kmax', 'params.Pcc', 'params.N' are provided; otherwise, please set 'params.isBestK'" + ...
+            " to false.")
     end
-    if params.Pcc > 100 || params.Pcc < 50
-        error("The range of Pcc should be within [50, 100].")
-    end
-    if params.N < 0
-        error("The minimum value of params.N should be greater than 0.")
-    end
-    Kmax = params.Kmax;
-    Pcc = params.Pcc;
-    N = params.N;
+else
+    isBestK = false;
 end
-
 
 cd(inputDir)
 subList = getSublistByPrefixed(inputDir, prefix);
@@ -159,7 +165,9 @@ if size(firstNIIFile, 1) == 0
     end
 end
 if isfield(params, "TR")
-    params.TR = str2double(params.TR);
+    if isequal(class(params.TR), 'char') ||  isequal(class(params.TR), 'string')
+        params.TR = str2double(params.TR);
+    end
     TR = params.TR;
 else
     

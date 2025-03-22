@@ -38,7 +38,7 @@ function bestK = NDN_ISCAP(inputDir, prefix, grayMatterMask, savedDir, params, a
 % you only need to fill in the following parameters. Once these parameters
 % are provided, ISCAP / CAP values will not be calculated, and instead,
 % a best K value will be returned.
-%
+%   params.isBestK  -  a boolen, 
 %   params.Kmax     -  a number in the range [2, 12]. Once you specify this
 %                      Kmax, the function will calculate the best K value
 %                      within the range [2, Kmax].
@@ -103,17 +103,31 @@ if isequal(params.method, 'ISCAP')
     if exist(desAdd, "dir")
         cd(desAdd)
         subListTask = getSublistByPrefixed(desAdd, prefix);
-    elseif numel(subListTask) == numel(subList)
-        
+        if numel(subListTask) == numel(subList)
+            for taskSub_i = 1:numel(subListTask)
+                cd([desAdd filesep subListTask(taskSub_i).name filesep 'func'])
+                niiList = dir('*.nii');
+                if numel(niiList) == 0
+                     isRunFlag = false;
+                end
+            end
+        else
+            isRunFlag = false;
+        end
     else
         isRunFlag = false;
     end
 
 
-    if nargin == 6
-        generateTaskResting(inputDir, prefix, dataType, grayMatterMask, app)
+    if ~isRunFlag
+        if nargin == 6
+            generateTaskResting(inputDir, prefix, dataType, grayMatterMask, app)
+        else
+            generateTaskResting(inputDir, prefix, dataType, grayMatterMask)
+        end
     else
-        generateTaskResting(inputDir, prefix, dataType, grayMatterMask)
+        disp("Intermediate files already exist, no need to perform" + ...
+            " inter-subject analysis on the files, directly use the cached files.")
     end
     
     workingDir = [inputDir filesep 'LOO_ResReg\Task'];
@@ -319,7 +333,7 @@ if isBestK
     [handles.Consensus] = CAP_ConsensusClustering(Xonp{1},2:Kmax,'items', Pcc/100, N,'correlation');
     [~,Lorena] = ComputeClusteringQuality(handles.Consensus,2:Kmax);
     consensusQuality = 1-Lorena; % （kmax - 1） * 20
-    meanConsensusQuality = [-1, mean(consensusQuality, 2)]; 
+    meanConsensusQuality = [-1; mean(consensusQuality, 2)]; 
     [~, bestK] = max(meanConsensusQuality);
     app.BestK_Label.Text = ['Best K is ' num2str(bestK)];
     disp(['Best K is ' num2str(bestK)])
