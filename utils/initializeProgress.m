@@ -22,7 +22,7 @@ app.ax.XColor = [0.94, 0.94, 0.94];
 app.ax.YColor = [0.94, 0.94, 0.94];
 app.ax.HitTest = 'off';
 app.isCreateAx = true;
-app.ProgrssBarLabel.Visible = 'off';
+app.ProgressBarLabel.Visible = 'off';
 
 
 end
