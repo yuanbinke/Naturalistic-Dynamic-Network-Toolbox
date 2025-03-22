@@ -1,6 +1,6 @@
-function ISCAP(inputDir, prefix, grayMatterMask, savedDir, params, app)
-%FORMAT ISCAP(inputDir,prefix, grayMatterMask, savedDir, params, app)
-%ISCAP evaluate intersubject coactivation pattern analysis (ISCAP) among
+function bestK = NDN_ISCAP(inputDir, prefix, grayMatterMask, savedDir, params, app)
+%FORMAT NDN_ISCAP(inputDir,prefix, grayMatterMask, savedDir, params, app)
+%NDN_ISCAP evaluate intersubject coactivation pattern analysis (ISCAP) among
 % one group of subjects.This is an improved approach based on co-activation
 % pattern analysis (CAP), which can accomplish a higher spatiotemporal
 % consistency.
@@ -23,8 +23,8 @@ function ISCAP(inputDir, prefix, grayMatterMask, savedDir, params, app)
 %                   the current group. When params.TR is not exist, ISCAP
 %                   will automatically read the first subject's nii file
 %                   header to acquire the TR.
-%   params.Tmot     - A head movement threshold, double type field,is used 
-%                   to exclude frames that do not meet this threshold 
+%   params.Tmot     - A head movement threshold, double type field,is used
+%                   to exclude frames that do not meet this threshold
 %   params.K        - K is used to specify the number of clusters should
 %                   eventually form in the current run.
 %   params.Pp
@@ -33,7 +33,18 @@ function ISCAP(inputDir, prefix, grayMatterMask, savedDir, params, app)
 %                   specified as one of the following strings:
 %                       - 'ISCAP': intersubject co-activation pattern.
 %                       - 'CAP': co-activation pattern.
-%   params.Kmax    - Optional arguments, a Number 
+%
+% The below are the optional parameters. If you need to find the best K,
+% you only need to fill in the following parameters. Once these parameters
+% are provided, ISCAP / CAP values will not be calculated, and instead,
+% a best K value will be returned.
+%
+%   params.Kmax     -  a number in the range [2, 12]. Once you specify this
+%                      Kmax, the function will calculate the best K value
+%                      within the range [2, Kmax].
+%   params.Pcc      -  a number in the range [50, 100], representing the
+%                      percentage of the original data to be retained.
+%   params.N        -  the number of folds over which to run
 %
 % app               - a optional argument, is a uiobject
 %
@@ -63,19 +74,62 @@ end
 if params.Tmot < 0
     error("The minimum value of params.Tmot should be greater than 0.")
 end
-if isfield(params, 'kMAx')
+
+isBestK = false;
+if isfield(params, 'Kmax') && isfield(params, 'Pcc') && isfield(params, 'N')
+    isBestK = true;
+    if params.Kmax > 12 || params.Kmax < 2
+        error("The range of k should be within [2, 12].")
+    end
+    if params.Pcc > 100 || params.Pcc < 50
+        error("The range of Pcc should be within [50, 100].")
+    end
+    if params.N < 0
+        error("The minimum value of params.N should be greater than 0.")
+    end
+    Kmax = params.Kmax;
+    Pcc = params.Pcc;
+    N = params.N;
+end
 
 
-
+cd(inputDir)
+subList = getSublistByPrefixed(inputDir, prefix);
 if isequal(params.method, 'ISCAP')
     dataType = 'task';
 
-    if nargin == 6
-        generateTaskResting(inputDir, prefix, dataType, grayMatterMask, app)
+    isRunFlag = true;
+    desAdd = [inputDir filesep 'LOO_ResReg' filesep 'Task'];
+    if exist(desAdd, "dir")
+        cd(desAdd)
+        subListTask = getSublistByPrefixed(desAdd, prefix);
+        if numel(subListTask) == numel(subList)
+            for taskSub_i = 1:numel(subListTask)
+                cd([desAdd filesep subListTask(taskSub_i).name filesep 'func'])
+                niiList = dir('*.nii');
+                if numel(niiList) == 0
+                     isRunFlag = false;
+                end
+            end
+        else
+            isRunFlag = false;
+        end
     else
-        generateTaskResting(inputDir, prefix, dataType, grayMatterMask)
+        isRunFlag = false;
     end
 
+
+    if ~isRunFlag
+        if nargin == 6
+            generateTaskResting(inputDir, prefix, dataType, grayMatterMask, app)
+        else
+            generateTaskResting(inputDir, prefix, dataType, grayMatterMask)
+        end
+    else
+        disp("Intermediate files already exist, no need to perform" + ...
+            " inter-subject analysis on the files, directly use the cached files.")
+    end
+    
     workingDir = [inputDir filesep 'LOO_ResReg\Task'];
 else
     workingDir = inputDir;
@@ -108,7 +162,7 @@ if isfield(params, "TR")
     params.TR = str2double(params.TR);
     TR = params.TR;
 else
-
+    
     [~, h] = NDN_Read(firstNIIFile(1).name, 1);
     if size(h.PixelDimensions, 2) == 4
         TR = h.PixelDimensions(1, 4);
@@ -116,14 +170,14 @@ else
         error("You must input an accurate params." + ...
             "TR because the header of the 4D nii file does not provide this information.")
     end
-
+    
 end
 
 if TR < 0
     error("Invalid input! you should enter a number greater than 0 for params.TR")
 end
-    
-   
+
+
 Tmot = params.Tmot; % 0.5
 K = params.K;
 Pp = params.Pp;
@@ -157,20 +211,20 @@ FD = {};
 if nargin == 6
     app.ax.Title.String = 'Loading subjects...';
     patch(app.ax,[0, 1, 1, 0], [0, 0, 1, 1], [1, 1, 1]);
-
+    
     app.ax.Color = [0.9375, 0.9375, 0.3375];
     ph = patch(app.ax,[0, 0, 0, 0], [0, 0, 1, 1], [0.6745, 1, 0.8045]);
 end
 
 for i = 1:size(subList,1)
-
+    
     disp(['Currently loading subject ',num2str(i),'...']);
-
+    
     if ~exist([workingDir filesep subList(i).name filesep 'func'])
         mkdir([workingDir filesep subList(i).name filesep 'func'])
     end
     cd([workingDir filesep subList(i).name filesep 'func']);
-
+    
     NIIFile = dir('*.nii');
     if size(NIIFile, 1) == 0
         NIIFile = dir('*.nii.gz');
@@ -182,32 +236,32 @@ for i = 1:size(subList,1)
             NIIFile = dir('*.nii.gz');
         end
     end
-
+    
     tmp_data = [];
     [d, ~]=NDN_Read(NIIFile(1).name);
     [s1,s2,s3,s4]=size(d);
     temp=reshape(d,[s1*s2*s3,s4]);
     tmp_data=temp(mask{1},:)';
-
+    
     % Z-scoring is performed within the toolbox
     % tmp_data = detrend(tmp_data);
     % tmp_data = zscore(tmp_data);
     tmp_data = (tmp_data-repmat(mean(tmp_data),size(tmp_data,1),1)) ./ repmat(std(tmp_data),size(tmp_data,1),1);
     tmp_data(isnan(tmp_data)) = 0;
-
+    
     % The ready-to-analyse data is put in TC
-
+    
     TC{1}{i} = tmp_data;
     TXTFile = dir('*.txt');
-
+    
     if size(TXTFile, 1) == 0
         FD{1}(:,i) = zeros(size(tmp_data, 1),1);
         disp(['Could not process motion text file of ' subList(i).name '; assuming zero movement...']);
     else
         FD{1}(:,i) = CAP_ComputeFD(TXTFile(1).name);
     end
-
-
+    
+    
     if nargin == 6
         subNum = i;
         Nsub = size(subList,1);
@@ -266,13 +320,31 @@ FrameIndices{1} = Indices;
 %% best k
 
 % Computes the consensus results
-[handles.Consensus] = CAP_ConsensusClustering(Xonp{1},2:Kmax,'items',handles.PCC/100,handles.n_rep,'correlation');
+if isBestK
+    if nargin == 6
+        app.ax.Title.String = ['Computing best K, it will take a long time...'];
+        patch(app.ax,[0, 1, 1, 0], [0, 0, 1, 1], [1, 1, 1]);
+        
+        app.ax.Color = [0.9375, 0.9375, 0.3375];
+        ph = patch(app.ax,[0, 0, 0, 0], [0, 0, 1, 1], [0.6745, 1, 0.8045]);
+        drawnow
+    end
 
-% Calculates the quality metrics
-[~,Lorena] = ComputeClusteringQuality(handles.Consensus,2:handles.Kmax);
-
-handles.is_consensus_clustering = 1;
-handles.ConsensusQuality = 1-Lorena;
+    [handles.Consensus] = CAP_ConsensusClustering(Xonp{1},2:Kmax,'items', Pcc/100, N,'correlation');
+    [~,Lorena] = ComputeClusteringQuality(handles.Consensus,2:Kmax);
+    consensusQuality = 1-Lorena; % （kmax - 1） * 20
+    meanConsensusQuality = [-1; mean(consensusQuality, 2)]; 
+    [~, bestK] = max(meanConsensusQuality);
+    app.BestK_Label.Text = ['Best K is ' num2str(bestK)];
+    disp(['Best K is ' num2str(bestK)])
+    if nargin == 6
+        ph.XData = [0, 1, 1, 0];
+        jindu = sprintf('%.2f',0.99 * 100);
+        app.ax.Title.String =[ 'Computing best k '  jindu '%...'];
+        drawnow
+    end
+    return
+end
 
 % set(handles.CCPlot,'Visible','on');
 % tmp_plot = bar(2:handles.Kmax,1-Lorena,'Parent',handles.CCPlot);
@@ -283,7 +355,7 @@ handles.ConsensusQuality = 1-Lorena;
 % set(get(tmp_plot(1),'Parent'),'Box','off');
 % custom_cm = cbrewer('seq','Reds',25);
 % colormap(handles.CCPlot,custom_cm(6:25,:));
-    
+
 %% running cluster
 
 % Indices of the CAP to which frames from the reference population and from
@@ -291,7 +363,7 @@ handles.ConsensusQuality = 1-Lorena;
 if nargin == 6
     app.ax.Title.String = ['Computing ' params.method ' , it will take a long time...'];
     patch(app.ax,[0, 1, 1, 0], [0, 0, 1, 1], [1, 1, 1]);
-
+    
     app.ax.Color = [0.9375, 0.9375, 0.3375];
     ph = patch(app.ax,[0, 0, 0, 0], [0, 0, 1, 1], [0.6745, 1, 0.8045]);
     drawnow
@@ -315,12 +387,12 @@ Betweenness = {}; kin = {}; kout = {}; SubjectEntries = {};
     FrameIndices{1}.scrubbedandactive,...
     K,TR);
 
-    if nargin == 6
-        ph.XData = [0, 1, 1, 0];
-        jindu = sprintf('%.2f',0.99 * 100);
-        app.ax.Title.String =[ 'Computing ' params.method  jindu '%...'];
-        drawnow
-    end
+if nargin == 6
+    ph.XData = [0, 1, 1, 0];
+    jindu = sprintf('%.2f',0.99 * 100);
+    app.ax.Title.String =[ 'Computing ' params.method  jindu '%...'];
+    drawnow
+end
 
 %% generate CAPs transition matrix tif
 tmp_toplot = [];
@@ -337,7 +409,7 @@ set(gca, 'FontName','Arial','FontSize',25,'LineWidth', 1.5);
 xlim([0 size(tmp_toplot, 2)])
 xlabel(gca,'Time [s]','FontSize',36);
 ylabel(gca,'Subjects','FontSize',36);
-try 
+try
     clim([-1,K+1]);
 catch
     caxis([-1,K+1]);
@@ -392,7 +464,7 @@ nT = size(stateTransition, 2);
 state_to_state = zeros(K, K);
 for s = 1:nSub
     for i = 1:nT-1
-        current_state = stateTransition(s, i);    
+        current_state = stateTransition(s, i);
         next_state = stateTransition(s, i+1);
         if (current_state <= 0|| next_state <= 0)
             continue
@@ -435,7 +507,7 @@ correlation_matrix = corrcoef(stateTransition');
 figure;
 imagesc(correlation_matrix);
 colormap(jet);
-caxis([-1 1]); 
+caxis([-1 1]);
 colorbar;
 title('Subjects correlation');
 set(gca, 'FontName','Arial','FontSize', 12);
