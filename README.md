@@ -273,7 +273,7 @@ The toolbox implements 10 dynamic analysis methods for ROI-based approaches:
     - Used as input for Clustering & Visualization (Step 3).
 - **Example Output**: See Figure 7.
 
-![img](file://C:/Users/chenlifeng/Desktop/work/Naturalistic-Dynamic-Network-Toolbox/assets/README_pics/1742908344583.png?lastModify=1742915264)
+![1742917298761](assets/README_pics/1742917298761.png)
 
 <center style="font-weight: 700">Figure 7. ROI Method Output</center>
 
