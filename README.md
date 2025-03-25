@@ -1,206 +1,402 @@
-# Naturalistic-Dynamic-Network-Toolbox(NaDyNet)
+Naturalistic-Dynamic-Network-Toolbox(NaDyNet)
 
 
 
-## **一.** **软件概述**
+## **1. Software Overview**
 
-NaDyNet是一款基于MATLAB的GUI软件，适用于分析自然刺激下的任务态fMRI数据（也适用于静息态fMRI数据）。旨在推动自然场景神经科学的发展。
+NaDyNet is a MATLAB-based GUI software designed for analysing task-based fMRI data under naturalistic stimuli (also applicable to resting-state fMRI data), aiming to advance naturalistic scene neuroscience.
 
-自然刺激是指内容丰富且连续的刺激，如看电影或听故事。自然刺激是当前脑科学研究中的一种新兴范式。不同于组块或者事件相关设计，连续刺激fMRI信号很难基于GLM进行分析。NaDyNet提供了能够实时分析脑网络和激活的动态分析方法。
+**Naturalistic stimuli** refer to rich and continuous stimuli such as watching movies or listening to stories. This paradigm represents an emerging trend in brain science research. Unlike block or event-related designs, continuous-stimulus fMcRI signals are challenging to analyse using traditional GLM methods. NaDyNet provides dynamic analysis methods capable of real-time brain network and activation analysis.
 
-此外，任务态fMRI信号包括任务诱发成分，自发活动成分（占绝大比例），以及非神经成分（头动等）。本软件的创新点是在前人动态分析方法基础上，引入被试间分析方法（inter-subject correlation），开创了增强版本的方法，消除自发活动和非神经信号的影响。
+**Naturalistic stimuli** refer to rich and continuous stimuli such as watching movies or listening to stories. This paradigm represents an emerging trend in brain science research. Unlike block or event-related designs, continuous-stimulus fMRI signals are challenging to analyze using traditional GLM methods. NaDyNet provides dynamic analysis methods capable of real-time brain network and activation analysis.
 
-NaDyNet提供了K均值聚类分析，求出最佳的K, 并且可视化聚类出的多种状态和相对应的状态转移矩阵。
+NaDyNet offers K-means clustering analysis to determine the optimal K value, visualizing multiple clustered states and their corresponding state transition matrices.
 
-## 二.软硬件环境要求
+## 2. Hardware and Software Requirements
 
-### **1.** **硬件要求**
+### **2.1 Hardware Requirements**
 
-该工具箱是分析fMRI（功能性磁共振成像）数据的一款MATLAB软件，由于fMRI数据比较庞大，因此要求内存至少大于等于16G。
+This toolbox is a MATLAB-based software for analyzing fMRI (functional magnetic resonance imaging) data. Due to the large size of fMRI data, a minimum of **16GB RAM** is required. Methods such as SWISC, CAP, and ISCAP are particularly memory-intensive; for example, the paranoia dataset (22 subjects, 1310 frames per subject) requires **128GB RAM** to run. Other methods have lower memory demands.
 
-对于其他硬件要求，只需要你的电脑可以打开并运行MATLAB 2018a或之后的版本即可
+Additional hardware requirements: Your computer must support MATLAB 2018a or later versions.
 
-### **2.** **软件要求**
+### **2.2 Software Requirements**
 
-为了能顺利的运行该MATLAB工具箱的相关功能，除了以上的硬件环境以外，还需要一定的软件支持。所需要的软件环境：
+To run this MATLAB toolbox, the following software environment is required:
 
-1. 操作系统：Windows 7 及以上
+1. **Operating System**: Windows 7 or later
 
-2. 网络环境：无要求
+2. **Network Environment**: No specific requirements
 
-3. 运行平台：MATLAB 2018a及其之后的版本
+3. **Platform**: MATLAB 2018a or later
 
-4. MATLAB环境： 要求必须安装以下工具包
+4. **MATLAB Toolboxes**: The following toolboxes must be installed:
 
-   (1) Medical Imaging Toolbox: 这是MATLAB 官方的一款自带的工具包，专门用于图像的处理。(一般是安装MATLAB时自带，在命令行输入如下命令, 如果显示出对应的路径则无需下载该工具包)
+   **(1) Medical Imaging Toolbox**: A default MATLAB toolbox for image processing (usually pre-installed). Verify its presence by running:
 
-   ```matlab
-   >> which niftiread
-   C:\Program Files\MATLAB\R2022b\toolbox\images\iptformats\niftiread.m
-   ```
+```matlab
+>> which niftiread
+C:\Program Files\MATLAB\R2022b\toolbox\images\iptformats\niftiread.m
+```
 
-   
 
-   (2) [SPM](https://www.fil.ion.ucl.ac.uk/spm/software/download/): 在本工具箱中用于读写和操作fMRI文件。
 
-   (3) [Group ICA Of fMRI Toolbox (GIFT)](https://github.com/trendscenter/gift)：用于对数据的结果进行分析。
+​	(2) [SPM](https://www.fil.ion.ucl.ac.uk/spm/software/download/): Used for reading/writing and manipulating fMRI files.
 
-   (4) [BrainNet Viewer](https://www.nitrc.org/projects/bnv/)： 在本工具箱中用于对3D的NII文件进行可视化，并且保存为图片。如果你无需将3D的NII文件进行可视化和保存的话，这一步是可选的。
+​	(3) [Group ICA Of fMRI Toolbox (GIFT)](https://github.com/trendscenter/gift)：For data analysis.
 
-   (5) [DCC](https://github.com/canlab/Lindquist_Dynamic_Correlation): 
+​	(4) [BrainNet Viewer](https://www.nitrc.org/projects/bnv/)： used for 3D NII file visualization and image export.
 
-   (6) [GLKF](https://github.com/PscDavid/dynet_toolbox):
+​	(5) [DCC](https://github.com/canlab/Lindquist_Dynamic_Correlation):  
 
-   (7) [CAP_TB](https://c4science.ch/source/CAP_Toolbox/):
+​	(6) [GLKF](https://github.com/PscDavid/dynet_toolbox): 
 
-   以上2-7依赖的软件包可以在他们对应的超链接进行下载，如果无法下载，可以通过 [该链接](https://pan.baidu.com/s/1Fw_xOWI4y7hVJtVafRQWPQ?pwd=k2tm) 进行一次性下载。
+​	(7) [CAP_TB](https://c4science.ch/source/CAP_Toolbox/):
 
-安装完 本工具包 和 以上所提及的工具包之后，需要在Matlab-主页-设置路径，将这些Matlab工具包所在路径全部添加进去，后续只需要在matlab命令行输入以下命令，即可打开本软件使用。
+Toolboxes 2–7 can be downloaded via their respective hyperlinks. Alternatively, a bundled download is available [here](https://pan.baidu.com/s/1Fw_xOWI4y7hVJtVafRQWPQ?pwd=k2tm).
+
+After installing the toolbox and its dependencies, add all toolbox paths via *MATLAB Home > Set Path*. Launch the software by running:
 
 ```matlab
 NaDyNet
 ```
 
+For convenience, an alias is also supported.
 
+```matlab
+NDN
+```
 
-## **三.** 软件功能和界面
 
-软件主界包括三部分，分别为数据提取模块、方法选择模块和聚类与绘图模块，如图1所示。
 
-在数据提取模块中，我们可以将一组被试的fMRI文件按照一定的规律存放到一个文件夹下，选择一个自己选定的感兴趣区掩模，即Regions of Interest(ROI) mask。提取这组被试的ROI的时间序列存放到自己设定的保存路径下。
+## **3. Software Features and Interface**
 
-在方法选择模块中，可分为基于感兴趣区的分析方法(ROI Method)和基于灰质体素的分析方法(Grey Matter Voxel Method)。在本软件中，如果你选择了基于灰质体素的分析方法，你是无需进行第一步的ROI时间序列的提取的。
+The main interface comprises three modules: **Data Extraction**, **Method Selection**, and **Clustering & Visualization** (Figure 1).
 
- 
 
-1) 基于感兴趣区的分析方法（ROI Methods）：这种方法聚焦于预先定义的感兴趣区域（ROI）进行动态脑网络分析。
 
-2) 基于灰质体素的分析方法(Grey Matter Voxel Method)：这种方法在整个大脑或灰质内，以体素为单位进行分析。
+In the **ROI TC Extraction Module**, we can organize a group of subjects' fMRI files into a designated folder following a specific naming convention. Then, by selecting a user-defined **Regions of Interest (ROI) mask**, we extract the ROI time series for these subjects and save them to a user-specified output path.
 
-3）聚类与绘图模块：你可以通过Best K这一功能求出最佳的K值，或者自己设定一个K值，让本工具将动态的脑网络分析方法的结果进行一个聚类，最终得出K个聚类中心（状态），并将这K个状态在界面上可视化，同时将这一组被试的状态转移矩阵绘制出来。
+In the **Method Selection Module**, two analysis approaches are available:
 
+1. **ROI-Based Methods**: These methods focus on **predefined regions of interest (ROIs)** for dynamic brain network analysis.
+2. **Grey Matter Voxel-Based Methods**: These methods analyze the entire brain or grey matter at the **voxel level**.
 
+If you choose the **Grey Matter Voxel-Based Method**, you can skip the first step (ROI time series extraction).
 
-![1732705429448](assets/README_pics/1732705429448.png)
+**Clustering & Plotting Module**:
 
- 
+- Use the **Best K** function to determine the optimal number of clusters (K).
+- Alternatively, manually set a K value to perform clustering on dynamic brain network analysis results.
+- The tool will generate **K cluster centers (states)**, visualize them, and plot the **state transition matrix** for the subject group.
 
-### **3.1 数据**提取模块
 
-在主界面的Step 1中，通过点击Extract ROI Time Course 按钮，可以进入到数据提取模块提取模块的界面。界面如下图所示：
 
-![1732705462766](assets/README_pics/1732705462766.png)
 
-首先，我们数据的组织形式应该如下图所示，当前的目录下，有3个被试，分别为sub-UTS01、02、03，对于每一个被试对应的fMRI文件（预处理后）存放到一个单独的文件夹下，并且每个文件夹命名要有一定规律，例如都是以字符串‘sub’开头，这样做的目的是为了排除其他无关的文件和文件夹。
 
-​			 ![1732705483632](assets/README_pics/1732705483632.png)
+![HomePage](assets/README_pics/HomePage.jpg)
 
-第二，我们可以自己选择一个ROI mask文件，作为一个掩模用来提取特定区域的ROI信号。注意，这里的ROI mask文件的体素大小和形状应该同被试的fMRI保持一致，否则是会出错的。
+<center style="font-weight: 700">Figure 1. Main Interface</center>
 
-第三，由于我们的被试的文件夹是按照一定的规律命名的，所以拥有共同的字符串前缀‘sub’，我们直需要输入正确的前缀，界面就会显示识别到了多少个被试，如图4所示，当前文件夹下的被试数量有3个。
+### **3.1 **Data Extraction Module
 
-第四，选个一个保存路径用于保存相应的结果
+Click *Extract ROI Time Course* in *Step 1* to access this module (Figure 2).
 
-第五，由于ROI mask种类繁多，为了对后续分析造成不必要的混淆，所以输入一个可以辨别的标签Tag，提醒该ROI的时间序列是在哪一个ROI mask下得到的。
+![ROI_TC_Extraction](assets/README_pics/ROI_TC_Extraction.jpg)
 
-  ![1732705556723](assets/README_pics/1732705556723.png)
+<center style="font-weight: 700">Figure 2. ROI Time Course Extraction Interface</center>
 
-当按照上述步骤正确输入之后，点击按钮Run即可运行，运行成功会如图4底部所示，告知你结果已经保存在你选定的目标文件夹下面。每一个被试的ROI时间序列会有一个对应的mat文件，这是一个二维矩阵数据，行数代表了时间点的个数，列数代表了ROI的个数，结果如图5所示。
 
-​                         ![1732705578087](assets/README_pics/1732705578087.png)
 
-### **3.2 方法选择模块**
+Subject data should follow the **BIDS** standard (Figure 3):
 
-在方法选择模块中，包含了基于感兴趣区的分析方法(ROI Method)和基于灰质体素的分析方法(Grey Matter Voxel Method)。
+- Each subject (e.g., `sub01`, `sub02`) has a dedicated folder containing fMRI files (preprocessed) in a `func` subdirectory.
+- Folder names must share a common prefix (e.g., `sub`).
 
-#### **3.2.1 基于感兴趣区的分析方法**
+​			              ![1742905965265](assets/README_pics/1742905965265.png)
 
-基于感兴趣区的分析方法本软件实现了10种动态分析方法(动态条件相关（Dynamic Conditional Correlation, 简称DCC), 基于滑动窗口的动态功能连接(sliding-window functional connectivity with L1-regularization,简称SSWFC), 灵活最小二乘法（flexible least squares,简称FLS）, 广义线性卡尔曼滤波器（general linear Kalman filter，简称GLKF）, 时间导数乘积（multiplication of temporal derivatives，简称MTD）及其5种对应的增强版本,被试间动态条件相关ISDCC,基于滑动窗口的被试间动态功能连接ISSWFC, 被试间灵活最小二乘法ISFLS,被试间广义线性卡尔曼滤波器ISGLKF, 被试间时间导数乘积ISMTD)和1种静态分析方法(静态功能链接，static functional connectivity,简称SFC)。
+<center style="font-weight: 700">Figure 3. Input File Structure</center>
 
-接下来介绍如何使用这些方法。
+**Steps**:
 
-​		![1732705617011](assets/README_pics/1732705617011.png)
+1. **ROI Mask**: Select a mask file (must match fMRI voxel dimensions).
+2. **Subject Prefix**: Enter the common prefix (e.g., `sub`); the interface will display the detected subject count (Figure 4).
+3. **Output Path**: Specify a save location.
+4. **Tag**: Assign a descriptive label for the ROI mask.
+5. **Optional**: For resting-state data, enable **Phase Randomization (PR)** or **Autoregressive Randomization (ARR)** to generate null models (for validating dynamic FC). The software will generate corresponding null model results and store them in the PR or ARR subfolders. If your goal is to verify whether the dynamic functional connectivity (DFC) in resting-state data is merely the result of sampling variability in static FC rather than genuine dynamic changes, you can check this option. For details, please refer to the paper: [Liégeois, R.; Laumann, T. O.; Snyder, A. Z.; Zhou, J.; Yeo, B. T. T. Interpreting Temporal Fluctuations in Resting-State Functional Connectivity MRI. *NeuroImage* **2017**, *163*, 437–455.](https://doi.org/10.1016/j.neuroimage.2017.09.012) 
 
-以基于滑动窗口的被试间动态功能链接ISSWFC这个方法为例子，如图6所示。
 
 
+![1742907073115](assets/README_pics/1742907073115.png)
 
-首先， 输入路径应该选择step1运行之后的结果所在的文件夹。注意，该文件夹所在的路径不可以存放其他以.mat结尾的文件。
+<center style="font-weight: 700">Figure 4. Example Input for Data Extraction</center>
 
-第二， 保存路径可以自己选择或者像图6一样为默认路径。
+After correctly entering all required parameters as described above, click the "Run" button to execute the process. Upon successful completion, as shown at the bottom of Figure 4, you will be notified that the results have been saved to your specified output folder.
 
-第三， 对于无需输入的参数的方法静态功能链接SFC，则无需做第三步直接运行，否则需要跟图六一样填写相应的参数。除了SFC外，剩余的10种方法，都需要输入方法的参数才可以成功的运行。接下来介绍以下这些方法涉及的参数的含义。
+For each subject, a corresponding .mat file containing the ROI time series will be generated. This file contains a two-dimensional matrix where:
 
-1) DCC界面的参数包括了TR，TR 是指 Repetition Time，即重复时间，取值范围需大于0(下同)。
+- Rows represent the number of time points
+- Columns represent the number of ROIs
 
-2) SWFC界面的参数包括了winSize和TR，winSize指的是动态功能连接中滑动窗口的大小，单位是TR，通常的取值范围在[20，40]个TR之间，其取值范围应大于1，小于总TR个数。
+If you have selected the null model option, additional subfolders (PR or ARR) will be automatically created to store the generated null model data. The output structure is illustrated in Figure 5.
 
-3) FLS界面的参数包括了mu和TR。mu代表penalty weights（惩罚权重）或者加权系数。默认值为100。
+Note: The software will preserve all original data while creating these additional null model datasets when the corresponding option is enabled.
 
-4) GLKF界面的参数包括了pKF、ucKF和TR。pKF：正整数，表示模型的阶数（即 MVAR 模型的滞后阶数）。ucKF：更新常数，用于自适应地更新噪声协方差矩阵。ucKF的取值范围通常在 [0, 1] 之间。
+​                  		![1742907196028](assets/README_pics/1742907196028.png)
 
-5) MTD界面的参数包括了MTDwsize。 MTDwsize 是一个用于平滑 MTD 值的参数，它通过在特定大小的窗口（以 TR 为单位）内对 MTD 原始值进行滑动窗平均，以减少噪声对分析结果的影响。
+<center style="font-weight: 700">Figure 5. ROI TC Output Files</center>
 
-6) 对于剩下5种对应的增强版本，界面会显示多一个参数ISA-Method，值分别为LOO和regressLOO，你可以选择两个中的其中一个作为被试间的分析方法。
+### **3.2 Method Selection Module**
 
-LOO, 将每个被试的源数据(维度为nT * nROI, nT代表时间点个数，nROI代表感兴趣区域个数)单独留出，使用剩余数据计算群体的平均值	LOO-Mean(维度为nT * nROI），之后与源数据进行列拼接形成最终的输入数据(维度为nT * 2nROI）)。
+The method selection module includes two analytical approaches: ROI-based methods and grey matter voxel-based methods.
 
-regressLOO，是在LOO的基础上，对每个被试的源数据(维度为nT * nROI）与 LOO_Mean(维度为nT * nROI）	时间序列进行线性回归分析，通过去均值和添加截距项来调整数据，接着使用线性回归计算得到残差，并从原始数据中减去这些残差以去除自发活动和非神经活动的影响。最后，返回任务诱发数据的时间序列数据(维度为nT * nROI）。这样的数据可以大约认为回归掉了一些无关信号(如被试的自发信号、核磁共振设备的系统噪声、被试的生理噪声)，只剩下了自然刺激引发的大脑信号。
+#### **3.2.1 ROI-Based Methods**
 
-通过引入被试间的ISA分析，可以一定程度提升结果的在时间和空间上的一致性（可参考Chen et al., 2024, Brain connectivity）。
+The toolbox implements 10 dynamic analysis methods for ROI-based approaches:
 
-最后， 方法运行完成之后的结果都会保存在指定的位置下，如图7所示。每一个人的结果都会对应一个以“.mat”结尾的文件。对于动态分析方法运行的结果，会额外多出一个以“_all.mat”结尾的文件里面包含了这一组被试所有的结果以及一些参数信息，可作为第三步聚类和绘图模块的输入。
+**Core Dynamic Methods:**
 
-![1732705671810](assets/README_pics/1732705671810.png)
+* Dynamic Conditional Correlation (**DCC**)
+* Sliding-Window Functional Connectivity with L1-regularization (**SWFC**)
+* Flexible Least Squares (**FLS**)
+* Generalized Linear Kalman Filter (**GLKF**)
+* Multiplication of Temporal Derivatives (**MTD**)
 
-#### **3.2.2 基于灰质体素的分析方法**
+**Enhanced Inter-Subject Versions:**
 
-本软件实现了3种基于灰质体素的分析方法，分别为共激活模式分析CAP、被试间共激活模式分析ISCAP、被试间相关ISC。
+* Inter-Subject DCC (**ISDCC**)
+* Inter-Subject SWFC (**ISSWFC**)
+* Inter-Subject FLS (**ISFLS**)
+* Inter-Subject GLKF (**ISGLKF**)
+* Inter-Subject MTD (**ISMTD**)
 
-首先，介绍以下输入文件的组织形式。我们数据的组织形式应该如下图所示，当前的目录下，有3个被试，分别为sub-UTS01、02、03，对于每一个被试对应的fMRI文件和相应的头动文件存放到一个单独的文件夹下，头动文件必须以“.txt”结尾。并且每个文件夹命名要有一定规律，例如都是以字符串‘sub’开头，这样做的目的是为了排除其他无关的文件和文件夹。如果计算被试间相关ISC方法的话，文件夹下面无需放置头动文件。如果你想运行的是（被试间）共激活模式分析(IS)CAP方法的话,是需要添加头动文件的，没有添加头动文件也可以运行，软件会默认为0头动。有一点需要注意的是这个头动文件的时间长度应该和fMRI文件的时间长度保持一致，否则会报错。
+**Static Method:**
 
-​			![1732705688943](assets/README_pics/1732705688943.png)
+- Static Functional Connectivity (**SFC**)
 
-第二，被试间相关（ISC）的界面如图9所示。操作步骤如下：
 
-（1）按照图8的规则组织好数据之后，就可以将数据所在的路径作为输入路径。
 
-（2）并且选择一个体素和大小与源数据相对应的灰质掩模（mask）。
+![1742907947232](assets/README_pics/1742907947232.png)
 
-（3）由于我们的被试的文件夹是按照一定的规律命名的，所以拥有共同的字符串前缀‘sub’，我们直需要输入正确的前缀，界面就会显示识别到了多少个被试。
+<center style="font-weight: 700">Figure 6. ISSWFC Interface</center>
 
-![1732705728864](assets/README_pics/1732705728864.png)
+**Workflow:**
 
-当按照上述的正确输入之后，点击按钮Run即可运行，运行成功会如图9底部所示，告知你结果已经保存在你选定的目标文件夹下面。每一个被试的ISC结果都会对应有两个3D NII文件，一个是ISC算出来的直接结果，另外一个是在此基础上做了一次Fisher's Z 变换。运行之后结果如图10所示，如果你在MATLAB添加了[BrainNet Viewer](https://www.nitrc.org/projects/bnv/)工具包，那么每一个3D文件都会生成一个相应的TIF图片。
+##### **1. Input Path Selection**
 
-​				![1732705745147](assets/README_pics/1732705745147.png)
+- **Path Requirement**: Select the folder containing outputs from Step 1. **Note**: The selected directory must not contain any other `.mat` files unrelated to the analysis.
 
-第三，被试间共激活模式（ISCAP）的界面如图11所示。操作步骤如下：
+##### **2. Output Path Specification**
 
-（1）按照图8的规则组织好数据之后，就可以将数据所在的路径作为输入路径。
+- **Options**:
+  - Manually specify a custom save path.
+  - Use the default path (as shown in Figure 6).
 
-（2）并且选择一个体素和大小与源数据相对应的灰质掩模（mask）。
+##### **3. Parameter Input Rules**
 
-（3）由于我们的被试的文件夹是按照一定的规律命名的，所以拥有共同的字符串前缀‘sub’，我们直需要输入正确的前缀，界面就会显示识别到了多少个被试。
+- **For SFC (Static Functional Connectivity)**: No additional parameters required. Proceed directly to execution.
+- **For Other 10 Methods**: Mandatory parameter input (see Figure 6). Below are detailed descriptions:
 
-（4）接下来就是在页面输入合适的ISCAP参数。参数runName可以用来标识当前这组被试的数据。Tmot作为一个头动阈值，软件会根据Tmot的数值和头动文件的内容用来筛出掉fMRI那些头动较大时的帧。K代表了聚类个数，一般K的输入范围在1-12。TR 是指 Repetition Time，即重复时间。pN, pP分别指定应保留用于聚类的正值和负值体素的比例（其余体素则设置为零）。pN, pP的取值范围是 [1，100]。
+------
 
-​			![1732705768536](assets/README_pics/1732705768536.png)
+**Method-Specific Parameters**
 
-当按照上述的正确输入之后，点击按钮Run即可运行，运行成功会如图11底部所示，告知你结果已经保存在你选定的目标文件夹下面。每一个被试的ISCAP结果都会对应有两个 3D NII文件，一个是ISCAP算出来的直接结果，另外一个是在此基础上做了一次Z 分数。此外，还会生成一个状态转移矩阵的mat文件和相应的图片。
+**1. DCC (Dynamic Conditional Correlation)**
 
-运行之后结果如图12所示，如果你在MATLAB添加了[BrainNet Viewer](https://www.nitrc.org/projects/bnv/)工具包，那么每一个3D文件都会生成一个相应的TIF图片。
+- **TR (Repetition Time)**:
+  - Definition: Time interval between consecutive fMRI volume acquisitions.
+  - Value Range: Must be >0.
+  - Unit: Seconds.
 
-​                 						![1732705788433](assets/README_pics/1732705788433.png)
+##### **2. SWFC (Sliding-Window Functional Connectivity)**
 
-### **3.3. 聚类和绘图模块**
+- **winSize (Window Size)**:
+  - Definition: Duration of the sliding window for dynamic FC calculation.
+  - Unit: TR
+  - Typical Range: [20, 40] TRs.
+  - Constraints: Must be >1 and < total TR count.
+- **TR**: As above.
 
-在此模块中，可分为3部分，分别为求最佳K值、K均值聚类分析和绘图，如图13所示。
+##### **3. FLS (Flexible Least Squares)**
 
-![1732705820640](assets/README_pics/1732705820640.png)
+- **mu (Penalty Weight)**:
+  - Definition: Regularization coefficient balancing model fit and smoothness.
+  - Default: 100.
+- **TR**: As above.
 
-在最佳K值求解部分，用户只需要输入以“_all.mat”结尾的文件，并且选择一个求解聚类的距离方法。该“_all.mat”结尾的文件是动态分析方法运行产生的结果，该文件所在位置如图7所示。点击Best K按钮即可运行，运行之后界面会显示出最佳的K值。
+##### **4. GLKF (Generalized Linear Kalman Filter)**
 
-在K均值聚类分析的部分，用户可以使用上一步求出的最佳的Best K，或者输入自己想要的K值。同时选择一个求解聚类的距离方法，最后点击Cluster按钮即可进行K均值聚类并在右侧生成K个状态矩阵图（矩阵大小均为nROI * nROI，其中nROI代表n个感兴趣区域）和一个状态转移矩阵图（矩阵大小均为nSub * nROI，矩阵图的大小为nSub * ( nROI * TR)，其中nSub 代表n个被试），如图14所示。
+- **pKF (Model Order)**:
+  - Definition: Lag order of the multivariate autoregressive (MVAR) model.
+  - Value: Positive integer.
+- **ucKF (Update Constant)**:
+  - Definition: Adaptive noise covariance adjustment factor.
+  - Range: [0, 1].
+- **TR**: As above.
 
-​       ![1732705879172](assets/README_pics/1732705879172.png)
+##### **5. MTD (Multiplication of Temporal Derivatives)**
+
+- **MTDwsize (Smoothing Window)**:
+  - Definition: Window size for averaging MTD raw values to reduce noise.
+  - Unit: TR.
+
+------
+
+**Inter-Subject Analysis (ISA) Parameters**
+
+**Applicable to Enhanced Methods (ISDCC/ISSWFC/ISFLS/ISGLKF/ISMTD)**
+
+- **ISA-Method**: Two options:
+
+  1. **LOO (Leave-One-Out)**:
+     - Workflow:
+       - For each subject, exclude their data and compute group mean (`LOO-Mean`, size: `nT × nROI`).
+       - Concatenate subject’s original data (`nT × nROI`) with `LOO-Mean` → Final input (`nT × 2nROI`).
+  2. **regressLOO (Regression-Adjusted LOO)**:
+     - Workflow:
+       - Perform linear regression between original data (`nT × nROI`) and `LOO-Mean`.
+       - Subtract residuals to remove spontaneous/non-neural signals (e.g., scanner noise, physiological artifacts).
+       - Output: Task-evoked time series (`nT × nROI`).
+
+  - **Purpose**: Enhances spatiotemporal consistency **(see Chen et al., 2024, Brain Connectivity)**.
+
+------
+
+##### **Output File Structure**
+
+- **SFC Results**:
+  - Format: Individual `.mat` files per subject.
+- **Dynamic Methods (DCC/SWFC/FLS/GLKF/MTD & ISA variants)**:
+  - Format: Single `_all.mat` file containing:
+    - All subjects’ results.
+    - Method parameters.
+    - Used as input for Clustering & Visualization (Step 3).
+- **Example Output**: See Figure 7.
+
+![img](file://C:/Users/chenlifeng/Desktop/work/Naturalistic-Dynamic-Network-Toolbox/assets/README_pics/1742908344583.png?lastModify=1742915264)
+
+<center style="font-weight: 700">Figure 7. ROI Method Output</center>
+
+#### **3.2.2 **Grey Matter Voxel-Based Methods
+
+Four voxel-level methods are implemented:
+
+- Co-Activation Patterns (**CAP**)
+- Inter-Subject CAP (**ISCAP**)
+- Inter-Subject Correlation (**ISC**)
+- Sliding-Window ISC (**SWISC**)
+
+Data Input Specifications
+
+1. **fMRI Data Requirements**
+   - Must follow **BIDS** directory structure: `subXX/func/`
+   - Each subject's fMRI scans stored in individual subject folders
+   - Example: `sub01/func/fmri_data.nii.gz`
+
+2. Motion Parameter Handling (for CAP/ISCAP)**: Compliant with CAP_TB Toolbox Storage Specifications
+   * Format: Plain text files with `.txt` extension
+   * Temporal requirement: Must precisely match fMRI scan duration
+   * Default behavior: System assumes zero motion when files are absent
+   * Note: **Only required for CAP/ISCAP** analyses (optional for ISC/SWISC)
+
+​                           ![1742908857432](assets/README_pics/1742908857432.png)
+
+<center style="font-weight: 700">Figure 8. Input Structure for Voxel-Based Methods</center>
+
+
+
+##### **ISC Workflow** (Figure 9):
+
+1. **Input Directory**: Path to organized subject data.
+2. **Grey Matter Mask**: Must match fMRI voxel dimensions.
+3. **Subject Prefix**: Enter common prefix (e.g., `sub`). Since all subject folders follow a standardized naming convention with the common prefix 'sub', simply entering this prefix will automatically display the number of identified subjects in the interface.
+
+![ISC-finished](assets/README_pics/ISC-finished-1742915918992.png)
+
+<center style="font-weight: 700">Figure 9. ISC Interface</center>
+
+Two 3D NII files per subject (raw ISC and Fisher’s Z-transformed). With [BrainNet Viewer](https://www.nitrc.org/projects/bnv/) installed, `.tif` images are also generated (Figure 10).
+
+​                                  ![1742915991996](assets/README_pics/1742915991996.png)
+
+<center style="font-weight: 700">Figure 10. ISC Output</center>
+
+##### **ISCAP Workflow** (Figure 11)
+
+(1) After organizing the data according to the rules shown in Figure 8, set the data directory as the input path.
+
+(2) Select a gray matter mask with voxel dimensions matching the source data.
+
+(3) Since subject folders follow a consistent naming pattern with the common prefix 'sub', simply enter this prefix and the interface will display the number of detected subjects.
+
+(4) Then input appropriate ISCAP parameters on the page:
+
+- RunName: Identifies the current subject group dataset.
+- Tmot: Motion threshold; frames exceeding this value in motion files will be excluded.
+- K: Number of clusters (typically 1-12).
+- TR: Repetition Time.
+- pN/pP: Percentage of positive/negative voxels retained for clustering (range: [1,100]); remaining voxels are set to zero.
+
+​			![finished-ISCAP](assets/README_pics/finished-ISCAP.png)
+
+<center style="font-weight: 700">Figure 11. ISCAP Interface</center>
+
+After entering these parameters correctly, click Run. Upon successful execution (as shown at the bottom of Figure 11), results will be saved in the specified output folder. Each subject's ISCAP results include:
+
+- Two 3D NII files: raw ISCAP results and Z-scored versions.
+- A state transition matrix (.mat file) with corresponding visualization.
+- Proportion of each state across all subjects after clustering
+- Transition probabilities between states
+- Correlation of state sequences for each subject
+
+As shown in Figure 12, if [BrainNet Viewer](https://www.nitrc.org/projects/bnv/) is installed in MATLAB, each 3D file will generate a corresponding TIF image.
+
+​       					![1742916358623](assets/README_pics/1742916358623.png)
+
+<center style="font-weight: 700">Figure 12. ISCAP Output</center>
+
+### 3.3. Clustering and Plotting Module
+
+This interface consists of four components: data input, optimal K value calculation, K-means clustering analysis, and visualization (Figure 13).
+
+![1742909781531](assets/README_pics/1742909781531.png)
+
+<center style="font-weight: 700">Figure 13. Clustering and Plotting Interface</center>
+
+1. **Data Input**: Users need to input files ending with **_all.mat**, which contain results from dynamic ROI analysis methods (file location shown in Figure 7). The interface will display file details automatically.
+
+2. **Optimal K Calculation**: Select a distance metric for clustering and click "Best K" to compute and display the optimal K value.
+3. **K-means Clustering**:
+
+- Use either the computed optimal K or manually specify a K value
+- Select a clustering distance metric
+- Click "Cluster" to perform K-means clustering and generate the following visualizations (Figure 14):
+  - K state matrices (size: nROI × nROI)
+  - State transition matrix (size: nSub × nT; x-axis in seconds, max = nT × TR)
+  - Proportion of each state across all subjects
+  - Transition probabilities between states
+  - Correlation of state sequences for each subject (matrix size: nSub × nSub)
+
+![1742910457509](assets/README_pics/1742910457509.png)
+
+<center style="font-weight: 700">Figure 14. Clustering and Plotting Results</center>
+
+**Output**:
+
+- Saved visualization images
+- Dynamic functional connectivity (DFC) variability for each subject (saved in "variability" folder)
+- An output file (Figure 15)
+
+![1742911571003](assets/README_pics/1742911571003.png)
+
+<center style="font-weight: 700">Figure 15. Output Data from Clustering and Plotting</center>
+
+The **_output.mat** file contains:
+
+- info: Input data information
+- plotting: Source data for visualizations (K clustered state matrices, subject correlation matrices, state proportions, transition probabilities)
+- clusterInfo: Clustering parameters (distance metric, K value)
+- stateTransition: State transition matrices for all subjects
+- median: Median DFC values per subject
+- mean: Mean DFC values per subject
+- variability: DFC variability per subject
