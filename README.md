@@ -341,7 +341,16 @@ Two 3D NII files per subject (raw ISC and Fisher’s Z-transformed). With [Brain
 - TR: Repetition Time.
 - pN/pP: Percentage of positive/negative voxels retained for clustering (range: [1,100]); remaining voxels are set to zero.
 
-​			![finished-ISCAP](assets/README_pics/finished-ISCAP.png)
+5) Determine the optimal K value using consensus clustering.
+*Note: This step is computationally intensive and memory-demanding. Run it only if necessary.*
+
+* **Kmax**: Range [3, 12]. The toolbox will search for the best K within [2, Kmax].
+* **Pcc**: Range [80, 100], the percentage of original data retained. *Recommended: 100* (smaller values may cause errors but can reduce computation if successful).
+* **N**: Number of iterations.
+
+After obtaining the optimal K, input it as **K** and click **Run** to execute ISCAP.
+
+​			![1742993184060](assets/README_pics/1742993184060.png)
 
 <center style="font-weight: 700">Figure 11. ISCAP Interface</center>
 

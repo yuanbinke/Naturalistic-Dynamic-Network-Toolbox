@@ -40,10 +40,10 @@ function bestK = NDN_ISCAP(inputDir, prefix, grayMatterMask, savedDir, params, a
 % are provided, ISCAP / CAP values will not be calculated, and instead,
 % a best K value will be returned.
 %   params.isBestK  -  A boolean value specifying whether to calculate the best K. 
-%   params.Kmax     -  a number in the range [2, 12]. Once you specify this
+%   params.Kmax     -  a number in the range [3, 12]. Once you specify this
 %                      Kmax, the function will calculate the best K value
 %                      within the range [2, Kmax].
-%   params.Pcc      -  a number in the range [50, 100], representing the
+%   params.Pcc      -  a number in the range [80, 100], representing the
 %                      percentage of the original data to be retained.
 %   params.N        -  the number of folds over which to run
 %
@@ -79,11 +79,11 @@ end
 if isfield(params, 'isBestK') && params.isBestK
     if isfield(params, 'Kmax') && isfield(params, 'Pcc') && isfield(params, 'N')
         isBestK = true;
-        if params.Kmax > 12 || params.Kmax < 2
-            error("The range of k should be within [2, 12].")
+        if params.Kmax > 12 || params.Kmax < 3
+            error("The range of k should be within [3, 12].")
         end
-        if params.Pcc > 100 || params.Pcc < 50
-            error("The range of Pcc should be within [50, 100].")
+        if params.Pcc > 100 || params.Pcc < 80
+            error("The range of Pcc should be within [80, 100].")
         end
         if params.N < 0
             error("The minimum value of params.N should be greater than 0.")
@@ -351,7 +351,7 @@ if isBestK
     disp(['Best K is ' num2str(bestK)])
     if nargin == 6
         ph.XData = [0, 1, 1, 0];
-        jindu = sprintf('%.2f',0.99 * 100);
+        jindu = sprintf('%.2f',1.000 * 100);
         app.ax.Title.String =[ 'Computing best k '  jindu '%...'];
         drawnow
     end
