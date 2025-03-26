@@ -110,10 +110,10 @@ Click *Extract ROI Time Course* in *Step 1* to access this module (Figure 2).
 
 Subject data should follow the **BIDS** standard (Figure 3):
 
-- Each subject (e.g., `sub01`, `sub02`) has a dedicated folder containing fMRI files (preprocessed) in a `func` subdirectory.
+- Each subject (e.g., `sub01`, `sub02`) has a dedicated folder containing fMRI files (preprocessed) , with .nii.gz and .nii extensions supported, in a `func` subdirectory.
 - Folder names must share a common prefix (e.g., `sub`).
 
-​			              ![1742905965265](assets/README_pics/1742905965265.png)
+​			                         ![dir_struct1](assets/README_pics/dir_struct1.png)
 
 <center style="font-weight: 700">Figure 3. Input File Structure</center>
 
@@ -289,17 +289,21 @@ Four voxel-level methods are implemented:
 Data Input Specifications
 
 1. **fMRI Data Requirements**
-   - Must follow **BIDS** directory structure: `subXX/func/`
+   
+   * Format: Files with `.nii.gz` and ` .nii` extensions supported
+   
+- Must follow **BIDS** directory structure: `sub-XX/func/`
    - Each subject's fMRI scans stored in individual subject folders
-   - Example: `sub01/func/fmri_data.nii.gz`
+   - Example: `sub-01/func/fmri_data.nii.gz`
+   
+2. **Motion Parameter Handling (for CAP/ISCAP)**: Compliant with CAP_TB Toolbox Storage Specifications
 
-2. Motion Parameter Handling (for CAP/ISCAP)**: Compliant with CAP_TB Toolbox Storage Specifications
-   * Format: Plain text files with `.txt` extension
+   * Format: Plain text files with `.txt` or `.csv `extension
    * Temporal requirement: Must precisely match fMRI scan duration
    * Default behavior: System assumes zero motion when files are absent
    * Note: **Only required for CAP/ISCAP** analyses (optional for ISC/SWISC)
 
-​                           ![1742908857432](assets/README_pics/1742908857432.png)
+​                                            ![dir_struct2](assets/README_pics/dir_struct2.png)
 
 <center style="font-weight: 700">Figure 8. Input Structure for Voxel-Based Methods</center>
 
@@ -363,7 +367,7 @@ This interface consists of four components: data input, optimal K value calculat
 
 <center style="font-weight: 700">Figure 13. Clustering and Plotting Interface</center>
 
-1. **Data Input**: Users need to input files ending with **_all.mat**, which contain results from dynamic ROI analysis methods (file location shown in Figure 7). The interface will display file details automatically.
+1. **Data Input**: Users need to input files ending with **`_all.mat`**, which contain results from dynamic ROI analysis methods (file location shown in Figure 7). The interface will display file details automatically.
 
 2. **Optimal K Calculation**: Select a distance metric for clustering and click "Best K" to compute and display the optimal K value.
 3. **K-means Clustering**:
