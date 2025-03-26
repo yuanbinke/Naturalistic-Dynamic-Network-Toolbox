@@ -6,8 +6,9 @@ function bestK = NDN_ISCAP(inputDir, prefix, grayMatterMask, savedDir, params, a
 % consistency.
 %INPUT:
 % inputDir          - a directory which  contains all the subject data，every
-%                     subject 4D—nii file and its head motion file(.txt) is
-%                     put in a subdirectory like inputdir/sub001/data_sub001.nii + xxx.txt
+%                     subject 4D—nii file and its head motion file(.txt or .csv) 
+%                     is put in a subdirectory like
+%                     inputdir/sub001/data_sub001.nii(.gz) + xxx.txt(xxx.csv) 
 %                     if you don't have a head motion file, only 4D—nii
 %                     file in the subdirectory is acceptable.
 % prefix            - a String whose contents are decided by the target
@@ -260,13 +261,16 @@ for i = 1:size(subList,1)
     % The ready-to-analyse data is put in TC
     
     TC{1}{i} = tmp_data;
-    TXTFile = dir('*.txt');
+    HeadMotionFile = dir('*.txt');
+    if size(HeadMotionFile, 1) == 0
+        HeadMotionFile = dir('*.csv'); 
+    end
     
-    if size(TXTFile, 1) == 0
+    if size(HeadMotionFile, 1) == 0
         FD{1}(:,i) = zeros(size(tmp_data, 1),1);
         disp(['Could not process motion text file of ' subList(i).name '; assuming zero movement...']);
     else
-        FD{1}(:,i) = CAP_ComputeFD(TXTFile(1).name);
+        FD{1}(:,i) = CAP_ComputeFD(HeadMotionFile(1).name);
     end
     
     
