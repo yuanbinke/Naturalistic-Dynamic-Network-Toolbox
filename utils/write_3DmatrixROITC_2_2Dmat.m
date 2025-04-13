@@ -10,6 +10,7 @@ function write_3DmatrixROITC_2_2Dmat(ROI_TC, saveDir, sublist, postfix)
 % postfix     - a string that will serve as a suffix to the file name
 % e.g. if postfix ='raw', the 2D result will be sub001_raw.mat, sub002_raw.mat...
 
+ROI_TC(isnan(ROI_TC)) = 0;
 nSub = size(ROI_TC, 3);
 if ~exist(saveDir)
     mkdir(saveDir)
