@@ -2,7 +2,7 @@ Naturalistic-Dynamic-Network-Toolbox(NaDyNet)
 
 
 
-## **1. Software Overview**
+## 1. Software Overview
 
 NaDyNet is a MATLAB-based GUI software designed for analysing task-based fMRI data under naturalistic stimuli (also applicable to resting-state fMRI data), aiming to advance naturalistic scene neuroscience.
 
@@ -14,13 +14,13 @@ NaDyNet offers K-means clustering analysis to determine the optimal K value, vis
 
 ## 2. Hardware and Software Requirements
 
-### **2.1 Hardware Requirements**
+### 2.1 Hardware Requirements
 
 This toolbox is a MATLAB-based software for analyzing fMRI (functional magnetic resonance imaging) data. Due to the large size of fMRI data, a minimum of **16GB RAM** is required. Methods such as SWISC, CAP, and ISCAP are particularly memory-intensive; for example, the paranoia dataset (22 subjects, 1310 frames per subject) requires **128GB RAM** to run. Other methods have lower memory demands.
 
 Additional hardware requirements: Your computer must support MATLAB 2018a or later versions.
 
-### **2.2 Software Requirements**
+### 2.2 Software Requirements
 
 To run this MATLAB toolbox, the following software environment is required:
 
@@ -69,7 +69,7 @@ NDN
 
 
 
-## **3. Software Features and Interface**
+## 3. Software Features and Interface
 
 The main interface comprises three modules: **Data Extraction**, **Method Selection**, and **Clustering & Visualization** (Figure 1).
 
@@ -94,7 +94,7 @@ If you choose the **Grey Matter Voxel-Based Method**, you can skip the first ste
 
 
 
-![HomePage](assets/README_pics/HomePage.jpg)
+![HomePage](src/assets/README_pics/HomePage.jpg)
 
 <center style="font-weight: 700">Figure 1. Main Interface</center>
 
@@ -102,7 +102,7 @@ If you choose the **Grey Matter Voxel-Based Method**, you can skip the first ste
 
 Click *Extract ROI Time Course* in *Step 1* to access this module (Figure 2).
 
-![ROI_TC_Extraction](assets/README_pics/ROI_TC_Extraction.jpg)
+![ROI_TC_Extraction](src/assets/README_pics/ROI_TC_Extraction.jpg)
 
 <center style="font-weight: 700">Figure 2. ROI Time Course Extraction Interface</center>
 
@@ -113,7 +113,7 @@ Subject data should follow the **BIDS** standard (Figure 3):
 - Each subject (e.g., `sub01`, `sub02`) has a dedicated folder containing fMRI files (preprocessed) , with .nii.gz and .nii extensions supported, in a `func` subdirectory.
 - Folder names must share a common prefix (e.g., `sub`).
 
-​			                         ![dir_struct1](assets/README_pics/dir_struct1.png)
+​			                         ![dir_struct1](src/assets/README_pics/dir_struct1.png)
 
 <center style="font-weight: 700">Figure 3. Input File Structure</center>
 
@@ -127,7 +127,7 @@ Subject data should follow the **BIDS** standard (Figure 3):
 
 
 
-![1742907073115](assets/README_pics/1742907073115.png)
+![1742907073115](src/assets/README_pics/1742907073115.png)
 
 <center style="font-weight: 700">Figure 4. Example Input for Data Extraction</center>
 
@@ -142,17 +142,17 @@ If you have selected the null model option, additional subfolders (PR or ARR) wi
 
 Note: The software will preserve all original data while creating these additional null model datasets when the corresponding option is enabled.
 
-​                  		![1742907196028](assets/README_pics/1742907196028.png)
+​                  		![1742907196028](src/assets/README_pics/1742907196028.png)
 
 <center style="font-weight: 700">Figure 5. ROI TC Output Files</center>
 
-### **3.2 Method Selection Module**
+### 3.2 Method Selection Module
 
 The method selection module includes two analytical approaches: ROI-based methods and grey matter voxel-based methods.
 
-#### **3.2.1 ROI-Based Methods**
+#### 3.2.1 ROI-Based Methods
 
-The toolbox implements 10 dynamic analysis methods for ROI-based approaches:
+The software implements **12 ROI-based analysis methods**, of which **10** are dynamic and the remaining **2** are static:
 
 **Core Dynamic Methods:**
 
@@ -173,10 +173,11 @@ The toolbox implements 10 dynamic analysis methods for ROI-based approaches:
 **Static Method:**
 
 - Static Functional Connectivity (**SFC**)
+- Inter-subject Functional Connectivity (**ISFC**)
 
 
 
-![1742907947232](assets/README_pics/1742907947232.png)
+![1742907947232](src/assets/README_pics/1742907947232.png)
 
 <center style="font-weight: 700">Figure 6. ISSWFC Interface</center>
 
@@ -194,7 +195,7 @@ The toolbox implements 10 dynamic analysis methods for ROI-based approaches:
 
 ##### **3. Parameter Input Rules**
 
-- **For SFC (Static Functional Connectivity)**: No additional parameters required. Proceed directly to execution.
+- For **SFC** and **ISFC** : No additional parameters required. Proceed directly to execution.
 - **For Other 10 Methods**: Mandatory parameter input (see Figure 6). Below are detailed descriptions:
 
 ------
@@ -273,7 +274,7 @@ The toolbox implements 10 dynamic analysis methods for ROI-based approaches:
     - Used as input for Clustering & Visualization (Step 3).
 - **Example Output**: See Figure 7.
 
-![1742917298761](assets/README_pics/1742917298761.png)
+![1742917298761](src/assets/README_pics/1742917298761.png)
 
 <center style="font-weight: 700">Figure 7. ROI Method Output</center>
 
@@ -303,7 +304,7 @@ Data Input Specifications
    * Default behavior: System assumes zero motion when files are absent
    * Note: **Only required for CAP/ISCAP** analyses (optional for ISC/SWISC)
 
-​                                            ![dir_struct2](assets/README_pics/dir_struct2.png)
+​                                            ![dir_struct2](src/assets/README_pics/dir_struct2.png)
 
 <center style="font-weight: 700">Figure 8. Input Structure for Voxel-Based Methods</center>
 
@@ -315,13 +316,13 @@ Data Input Specifications
 2. **Grey Matter Mask**: Must match fMRI voxel dimensions.
 3. **Subject Prefix**: Enter common prefix (e.g., `sub`). Since all subject folders follow a standardized naming convention with the common prefix 'sub', simply entering this prefix will automatically display the number of identified subjects in the interface.
 
-![ISC-finished](assets/README_pics/ISC-finished-1742915918992.png)
+![ISC-finished](src/assets/README_pics/ISC-finished-1742915918992.png)
 
 <center style="font-weight: 700">Figure 9. ISC Interface</center>
 
 Two 3D NII files per subject (raw ISC and Fisher’s Z-transformed). With [BrainNet Viewer](https://www.nitrc.org/projects/bnv/) installed, `.tif` images are also generated (Figure 10).
 
-​                                  ![1742915991996](assets/README_pics/1742915991996.png)
+​                                  ![1742915991996](src/assets/README_pics/1742915991996.png)
 
 <center style="font-weight: 700">Figure 10. ISC Output</center>
 
@@ -350,7 +351,7 @@ Two 3D NII files per subject (raw ISC and Fisher’s Z-transformed). With [Brain
 
 After obtaining the optimal K, input it as **K** and click **Run** to execute ISCAP.
 
-​			![1742993184060](assets/README_pics/1742993184060.png)
+​			![1742993184060](src/assets/README_pics/1742993184060.png)
 
 <center style="font-weight: 700">Figure 11. ISCAP Interface</center>
 
@@ -364,7 +365,7 @@ After entering these parameters correctly, click Run. Upon successful execution 
 
 As shown in Figure 12, if [BrainNet Viewer](https://www.nitrc.org/projects/bnv/) is installed in MATLAB, each 3D file will generate a corresponding TIF image.
 
-​       					![1742916358623](assets/README_pics/1742916358623.png)
+​       					![1742916358623](src/assets/README_pics/1742916358623.png)
 
 <center style="font-weight: 700">Figure 12. ISCAP Output</center>
 
@@ -372,7 +373,7 @@ As shown in Figure 12, if [BrainNet Viewer](https://www.nitrc.org/projects/bnv/)
 
 This interface consists of four components: data input, optimal K value calculation, K-means clustering analysis, and visualization (Figure 13).
 
-![1742909781531](assets/README_pics/1742909781531.png)
+![1742909781531](src/assets/README_pics/1742909781531.png)
 
 <center style="font-weight: 700">Figure 13. Clustering and Plotting Interface</center>
 
@@ -390,7 +391,7 @@ This interface consists of four components: data input, optimal K value calculat
   - Transition probabilities between states
   - Correlation of state sequences for each subject (matrix size: nSub × nSub)
 
-![1742910457509](assets/README_pics/1742910457509.png)
+![1742910457509](src/assets/README_pics/1742910457509.png)
 
 <center style="font-weight: 700">Figure 14. Clustering and Plotting Results</center>
 
@@ -400,7 +401,7 @@ This interface consists of four components: data input, optimal K value calculat
 - Dynamic functional connectivity (DFC) variability for each subject (saved in "variability" folder)
 - An output file (Figure 15)
 
-![1742911571003](assets/README_pics/1742911571003.png)
+![1742911571003](src/assets/README_pics/1742911571003.png)
 
 <center style="font-weight: 700">Figure 15. Output Data from Clustering and Plotting</center>
 

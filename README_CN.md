@@ -2,7 +2,7 @@
 
 
 
-## **一.** **软件概述**
+## **一.** 软件概述
 
 NaDyNet是一款基于MATLAB的GUI软件，适用于分析自然刺激下的任务态fMRI数据（也适用于静息态fMRI数据）。旨在推动自然场景神经科学的发展。
 
@@ -20,7 +20,7 @@ NaDyNet提供了K均值聚类分析，求出最佳的K, 并且可视化聚类出
 
 对于其他硬件要求，只需要你的电脑可以打开并运行MATLAB 2018a或之后的版本即可
 
-### **2.** **软件要求**
+### **2.** 软件要求
 
 为了能顺利的运行该MATLAB工具箱的相关功能，除了以上的硬件环境以外，还需要一定的软件支持。所需要的软件环境：
 
@@ -87,15 +87,15 @@ NDN
 
 
 
-![HomePage](assets/README_pics/HomePage.jpg)
+![HomePage](src/assets/README_pics/HomePage.jpg)
 
 <center style="font-weight: 700">图一 软件主页面</center>
 
-### **3.1 数据**提取模块
+### 3.1 数据提取模块
 
 在主界面的Step 1中，通过点击Extract ROI Time Course 按钮，可以进入到数据提取模块的界面。界面如下图所示：
 
-![ROI_TC_Extraction](assets/README_pics/ROI_TC_Extraction.jpg)
+![ROI_TC_Extraction](src/assets/README_pics/ROI_TC_Extraction.jpg)
 
 <center style="font-weight: 700">图二 ROI时间序列提取页面</center>
 
@@ -103,7 +103,7 @@ NDN
 
 首先，我们数据的组织形式应该如下图所示，当前的目录下，有3个被试，分别为sub01、02、03，对于每一个被试对应的fMRI文件（预处理后）应当符合BIDS的要求，存放到一个单独的文件夹（sub-xx）下的func文件夹，并且每个文件夹命名要有一定规律，例如都是以字符串‘sub’开头，这样做的目的是为了排除其他无关的文件和文件夹。
 
-​			                       ![dir_struct1](assets/README_pics/dir_struct1.png)
+​			                       ![dir_struct1](src/assets/README_pics/dir_struct1.png)
 
 
 <center style="font-weight: 700">图三 输入文件组织方式</center>
@@ -120,23 +120,24 @@ NDN
 
 [Liégeois, R.; Laumann, T. O.; Snyder, A. Z.; Zhou, J.; Yeo, B. T. T. Interpreting Temporal Fluctuations in Resting-State Functional Connectivity MRI. *NeuroImage* **2017**, *163*, 437–455.](https://doi.org/10.1016/j.neuroimage.2017.09.012) 
 
-![1742907073115](assets/README_pics/1742907073115.png)
+![1742907073115](src/assets/README_pics/1742907073115.png)
 
 <center style="font-weight: 700">图4 数据提取页面输入示例</center>
 
 当按照上述步骤正确输入之后，点击按钮Run即可运行，运行成功会如图4底部所示，告知你结果已经保存在你选定的目标文件夹下面。每一个被试的ROI时间序列会有一个对应的mat文件，这是一个二维矩阵数据，行数代表了时间点的个数，列数代表了ROI的个数。如果你勾选了相应的空模型参数，也会生成相对应的文件夹保存这些空模型数据。结果如图5所示。
 
-​                  		![1742907196028](assets/README_pics/1742907196028.png)
+​                  		![1742907196028](src/assets/README_pics/1742907196028.png)
 
 <center style="font-weight: 700">图5 数据提取页面输出内容</center>
 
-### **3.2 方法选择模块**
+### 3.2 方法选择模块
 
 在方法选择模块中，包含了基于感兴趣区的分析方法(ROI Method)和基于灰质体素的分析方法(Grey Matter Voxel Method)。
 
-#### **3.2.1 基于感兴趣区的分析方法**
+#### 3.2.1 基于感兴趣区的分析方法
 
-基于感兴趣区的分析方法本软件实现了10种动态分析方法。
+基于感兴趣区的分析方法本软件实现了**12**种方法，可以细分为动态方法和静态方法：
+**10种动态分析方法：**
 
 * 动态条件相关（dynamic conditional correlation, 简称DCC)
 *  基于滑动窗口的动态功能连接(sliding-window functional connectivity with L1-regularization,简称SWFC)
@@ -152,15 +153,17 @@ NDN
 * 被试间广义线性卡尔曼滤波器ISGLKF （Inter-subject general linear Kalman filter，简称 ISGLKF）
 * 被试间时间导数乘积（Inter-subject multiplication of temporal derivatives，简称 ISMTD)
 
-还有1种静态分析方法
+**2种静态分析方法：**
 
 * 静态功能链接（static functional connectivity, 简称SFC)。
+
+* 被试间静态功能连接（Inter-subjectfunctional connectivity, 简称ISFC)。
 
   
 
 接下来介绍如何使用这些方法。以基于滑动窗口的被试间动态功能链接ISSWFC这个方法为例子，如图6所示。
 
-![1742907947232](assets/README_pics/1742907947232.png)
+![1742907947232](src/assets/README_pics/1742907947232.png)
 
 <center style="font-weight: 700">图6 ISSWFC界面展示图</center>
 
@@ -190,11 +193,13 @@ regressLOO，是在LOO的基础上，对每个被试的源数据(维度为nT * n
 
 最后， 方法运行完成之后的结果都会保存在指定的位置下，如图7所示。对于**SFC**, 每一个人的结果都会对应一个以“.mat”结尾的文件。对于动态分析方法运行的结果，会输出一个以“_all.mat”结尾的文件里面包含了这一组被试所有的结果以及一些参数信息，作为第三步聚类和绘图模块的输入。
 
-![1742908344583](assets/README_pics/1742908344583.png)
+![1742908344583](src/assets/README_pics/1742908344583.png)
 
 <center style="font-weight: 700">图7 ROI方法输出结果展示</center>
 
-#### **3.2.2 基于灰质体素的分析方法**
+
+
+#### 3.2.2 基于灰质体素的分析方法
 
 本软件实现了4种基于灰质体素的分析方法。
 
@@ -203,9 +208,13 @@ regressLOO，是在LOO的基础上，对每个被试的源数据(维度为nT * n
 * 被试间相关 ISC
 * 基于滑动窗的被试间相关 SWISC
 
+除了ISC是静态的方法，其余三种都是动态的。
+
+
+
 首先，介绍以下输入文件的组织形式。我们数据的组织形式应该如下图所示，当前的目录下，有3个被试，分别为sub01、02、03，对于每一个被试应按照BIDS要求， 将对应的**fMRI文件**（支持.nii.gz 和 .nii结尾的文件）存放到一个单独的文件夹（如sub01）下的func文件夹。同时将相应的**头动文件**（支持.txt 和 .csv 结尾的文件）也放置在相同的位置，如果没有添加头动文件也可以运行，软件会默认为0头动。有一点需要注意的是这个**头动文件的时间长度**应该和**fMRI文件的时间长度**保持**一致**，否则会报错。头动文件必须以“.txt”结尾。并且每个被试的文件夹命名要有一定规律，例如都是以字符串‘sub’开头，这样做的目的是为了排除其他无关的文件和文件夹。如果选择ISC，SWISC方法的话，文件夹下面无需放置头动文件。
 
-​                                         ![dir_struct2](assets/README_pics/dir_struct2.png)    
+​                                         ![dir_struct2](src/assets/README_pics/dir_struct2.png)    
 
 <center style="font-weight: 700">图8 灰质体素的分析方法下输入数据的组织形式</center>
 
@@ -217,11 +226,11 @@ regressLOO，是在LOO的基础上，对每个被试的源数据(维度为nT * n
 
 （3）由于我们的被试的文件夹是按照一定的规律命名的，所以拥有共同的字符串前缀‘sub’，我们直需要输入正确的前缀，界面就会显示识别到了多少个被试。
 
-![1732705728864](assets/README_pics/1732705728864.png)
+![1732705728864](src/assets/README_pics/1732705728864.png)
 
 当按照上述的正确输入之后，点击按钮Run即可运行，运行成功会如图9底部所示，告知你结果已经保存在你选定的目标文件夹下面。每一个被试的ISC结果都会对应有两个3D NII文件，一个是ISC算出来的直接结果，另外一个是在此基础上做了一次Fisher's Z 变换。运行之后结果如图10所示，如果你在MATLAB添加了[BrainNet Viewer](https://www.nitrc.org/projects/bnv/)工具包，那么每一个3D文件都会生成一个相应的TIF图片。
 
-​				![1732705745147](assets/README_pics/1732705745147.png)
+​				![1732705745147](src/assets/README_pics/1732705745147.png)
 
 第三，被试间共激活模式（ISCAP）的界面如图11所示。操作步骤如下：
 
@@ -237,7 +246,7 @@ regressLOO，是在LOO的基础上，对每个被试的源数据(维度为nT * n
 
 求完最佳的K值，你可以将该值作为K的值，然后再点击Run运行ISCAP
 
-​			![1742993184060](assets/README_pics/1742993184060.png)
+​			![1742993184060](src/assets/README_pics/1742993184060.png)
 
 <center style="font-weight: 700">图11 ISCAP运行界面</center>
 
@@ -245,15 +254,15 @@ regressLOO，是在LOO的基础上，对每个被试的源数据(维度为nT * n
 
 运行之后结果如图12所示，如果你在MATLAB添加了[BrainNet Viewer](https://www.nitrc.org/projects/bnv/)工具包，那么每一个3D文件都会生成一个相应的TIF图片。
 
-​             				![1742916358623](assets/README_pics/1742916358623.png)
+​             				![1742916358623](src/assets/README_pics/1742916358623.png)
 
 <center style="font-weight: 700">图12 ISCAP输出结果</center>
 
-### **3.3. 聚类和绘图模块**
+### 3.3. 聚类和绘图模块
 
 在此页面中，可分为4部分，分别为数据输入、求最佳K值、K均值聚类分析和绘图，如图13所示。
 
-![1742909781531](assets/README_pics/1742909781531.png)
+![1742909781531](src/assets/README_pics/1742909781531.png)
 
 <center style="font-weight: 700">图13 聚类与绘图界面</center>
 
@@ -269,13 +278,13 @@ regressLOO，是在LOO的基础上，对每个被试的源数据(维度为nT * n
 * 各个状态之间的转移概率
 * 每个被试的状态序列的相关性（矩阵大小均为nSub * nSub）
 
-![1742910457509](assets/README_pics/1742910457509.png)
+![1742910457509](src/assets/README_pics/1742910457509.png)
 
 <center style="font-weight: 700">图14 聚类与绘图结果界面</center>
 
 最后点击保存，除了会将图片结果保存下来，还会输出每个被试的DFC的变异性（保存在variability文件夹下）和一个output文件，如图15所示。
 
-![1742911571003](assets/README_pics/1742911571003.png)
+![1742911571003](src/assets/README_pics/1742911571003.png)
 
 <center style="font-weight: 700">图15 聚类与绘图输出的数据</center>
 
