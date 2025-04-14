@@ -25,7 +25,19 @@ if nargin == 2
     end
 end
 
-volData = double(volData);
+if isfield(volHead.raw, 'scl_slope')
+    scl_slope = volHead.raw.scl_slope;
+else
+    scl_slope = 1;
+end
+
+if isfield(volHead.raw, 'scl_inter')
+    scl_inter = volHead.raw.scl_inter;
+else
+    scl_inter = 0;
+end
+
+volData = double((volData .* scl_slope) + scl_inter);
 
 if strcmpi(ext,'.gz')
     delete(FileName);
