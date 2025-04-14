@@ -1,4 +1,4 @@
-function [ROI_TC] = read_2Dmat_2_3DmatrixROITC(inputdir)
+function [ROI_TC, fileList] = read_2Dmat_2_3DmatrixROITC(inputdir)
 %read_2Dmat_2_3DmatrixROITC can read nSub 2D (nT * nR) .mat or .txt file
 % and convert them as a 3D ROI_TC(nT * nR * nSub) matrix  
 %
