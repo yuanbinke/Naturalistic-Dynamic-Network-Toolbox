@@ -1,5 +1,5 @@
 function useViewInitialization(app)
-%useViewInitialization 初始化mlapp的初始位置，让他居中
+%useViewInitialization initializes the position of the view
 
 % get UIFigure Name
 allFields = fieldnames(app);
