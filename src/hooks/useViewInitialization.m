@@ -3,11 +3,11 @@ function useViewInitialization(app)
 
 % get UIFigure Name
 allFields = fieldnames(app);
-uiFigureFields = allFields(endsWith(allFields, 'UIFigure'));
+uiFigureFields = allFields(endsWith(allFields, 'Figure'));
 if numel(uiFigureFields) ~= 0
     figName = uiFigureFields{1};
 else
-    disp("Attribute ending with 'UIFigure' could not be found")
+    disp("Attribute ending with 'Figure' could not be found")
     return
 end
 
