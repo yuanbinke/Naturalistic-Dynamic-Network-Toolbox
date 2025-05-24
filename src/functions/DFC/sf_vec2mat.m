@@ -14,7 +14,14 @@ temp=ones(V);
 IND = find((temp-triu(temp))>0);
 
 vec2 = mat(IND);
-if ~isequal(vec,vec2)
+
+tmp = vec;
+tmp(isnan(tmp)) = 0;
+
+tmp2 = vec2;
+tmp2(isnan(tmp2)) = 0;
+
+if ~isequal(tmp, tmp2)
     error('Error: vector size does not match, please check')
 end
 end
