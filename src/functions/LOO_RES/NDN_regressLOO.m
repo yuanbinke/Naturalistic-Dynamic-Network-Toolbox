@@ -9,7 +9,7 @@ nROI = size(subData, 2);
 for i=1:nROI
     fprintf('.');
 
-    if sum(subData(:, i)) && sum(LOO_mean(:, i))
+    if ~all(subData(:, i) == 0) && ~all(LOO_mean(:, i) == 0)
 
         DependentVariable = squeeze(subData(:, i));
         ImgCovTemp = squeeze(LOO_mean(:, i));
