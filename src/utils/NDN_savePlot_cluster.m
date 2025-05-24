@@ -121,7 +121,7 @@ imagesc(state_to_state)
 colormap(flipud(gray));
 colorbar
 
-textStrings = num2str(state_to_state(:), '%0.2f');       % Create strings from the matrix values
+textStrings = num2str(state_to_state(:), '%0.3f');       % Create strings from the matrix values
 textStrings = strtrim(cellstr(textStrings));  % Remove any space padding
 [x, y] = meshgrid(1:size(state_to_state,1));  % Create x and y coordinates for the strings
 hStrings = text(x(:), y(:), textStrings(:), ...  % Plot the strings
